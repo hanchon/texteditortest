@@ -27,7 +27,11 @@ def read_root():
 
 @app.get("/dir")
 def dir():
-    os.chdir("/home/hanchon/devel/rama/backend/tests/")
+    try:
+        os.chdir("./tests/")
+    except Exception:
+        # Note: we are already in the tests folder
+        pass
     arr = os.listdir()
     res = {'data': arr}
     open_files.add(arr[1])
@@ -44,7 +48,7 @@ def open_file(filename: str):
 def get_file(filename: str):
     data = ""
     try:
-        file = open("/home/hanchon/devel/rama/backend/tests/"+filename)
+        file = open("./"+filename)
         data = file.read()
         file.close()
         return {'raw': data}

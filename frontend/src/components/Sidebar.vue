@@ -4,19 +4,35 @@
     <!-- <b-sidebar id="sidebar-1" title="Sidebar" shadow> -->
     <div class="sidebar-test">
       <p v-if="this.fetching">Fetching files...</p>
-      <ul v-else>
+      <!-- <ul v-else>
         <li v-for="item in this.files" v-bind:key="item">
           <button @click="openFile(item)">{{item}}</button>
         </li>
-      </ul>
+      </ul>-->
+
+      <!-- @nodeClick="nodeClick"
+      @nodeDoubleClick="nodeDoubleClick"
+      @nodeDrop="nodeDrop"-->
+      <!-- <div @click="doDashboard">Dashboard</div>
+      <div @click="doCustomers">Customers</div>-->
+
+      <file-browser-tree id="file-tree" ref="filetree" class="column" @nodeClick="openFile">
+        <template slot="context-menu">
+          <div>Dashboard</div>
+          <div>Customers</div>
+        </template>
+      </file-browser-tree>
     </div>
-    <!-- </b-sidebar>  -->
   </div>
 </template>
 
 <script>
+import FileBrowserTree from "vue-file-tree";
 export default {
   name: "sidebar",
+  components: {
+    "file-browser-tree": FileBrowserTree,
+  },
   data() {
     return {
       files: [],
@@ -28,12 +44,26 @@ export default {
     const data = await response.json();
     this.files = data.data;
     this.fetching = false;
+
+    // directory
+    // https://github.com/robogeek/vue-file-tree
+    this.$refs.filetree.addPathToTree("Directory", "dir", true);
+    this.files.forEach((element) => {
+      this.$refs.filetree.addPathToTree(element, "", false);
+    });
   },
   methods: {
-    async openFile(item) {
-      const response = await fetch("http://127.0.0.1:8000/open_file/" + item);
+    async openFile(event, node) {
+      console.log(event);
+      console.log(node.data);
+      console.log(node.title);
+      console.log(node.data.pathname);
+
+      const response = await fetch(
+        "http://127.0.0.1:8000/open_file/" + node.data.pathname
+      );
       const data = await response.json();
-      this.$parent.openFile(item);
+      this.$parent.openFile(node.data.pathname);
       console.log(data);
     },
   },

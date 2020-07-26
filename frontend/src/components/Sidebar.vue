@@ -54,17 +54,16 @@ export default {
   },
   methods: {
     async openFile(event, node) {
-      console.log(event);
-      console.log(node.data);
-      console.log(node.title);
-      console.log(node.data.pathname);
-
+      // console.log(event);
+      // console.log(node.data);
+      // console.log(node.title);
+      // console.log(node.data.pathname);
+    
       const response = await fetch(
         "http://127.0.0.1:8000/open_file/" + node.data.pathname
       );
-      const data = await response.json();
+      await response.json();
       this.$parent.openFile(node.data.pathname);
-      console.log(data);
     },
   },
 };

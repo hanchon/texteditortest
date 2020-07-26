@@ -55,6 +55,17 @@ def get_file(filename: str):
     except Exception:
         return {'raw': data}
 
+#TODO: allow links in the data str
+@app.get('/save_file/{filename}/{data}')
+def save_file(filename: str, data:str):
+    try:
+        file = open("./"+filename)
+        file.write(data)
+        file.close()
+        return {'raw': True}
+    except Exception:
+        return {'raw': False}
+
 @app.get("/close_file/{filename}")
 def close_file(filename: str):
     open_files.remove(filename)

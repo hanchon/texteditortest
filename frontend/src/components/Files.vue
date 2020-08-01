@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div id="filehandler" v-on:change="openFileDic">
     <b-nav tabs>
       <b-nav-item>Create new file</b-nav-item>
       <b-nav-item v-for="file in this.files" v-bind:key="file">
@@ -31,9 +31,19 @@ export default {
       return data;
     },
     async openFile(item) {
+      console.log(item)
       const response = await fetch("http://127.0.0.1:8000/open_file/" + item);
       const data = await response.json();
       this.$parent.openFile(item);
+      console.log(data);
+    },
+      async openFileDic(item) {
+      const name = item.detail.name
+      console.log(name)
+      
+      const response = await fetch("http://127.0.0.1:8000/open_file/" + name );
+      const data = await response.json();
+      this.$parent.openFile(name);
       console.log(data);
     },
   },

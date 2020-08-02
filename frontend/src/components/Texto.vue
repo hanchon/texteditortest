@@ -15,7 +15,10 @@
     import LinkPlugin from '../plugins/ckeditor5-link/src/link';
     import ParagraphPlugin from '@ckeditor/ckeditor5-paragraph/src/paragraph';
     import AutoLink from '../plugins/autolink/autolink';
-    import ClickObserver from '@ckeditor/ckeditor5-engine/src/view/observer/clickobserver';
+    //import AddToDict from '../plugins/addtodict/addtodict';
+    import List from '@ckeditor/ckeditor5-list/src/list';
+    import CreateDictionary from '../plugins/addtodict/createDictionary';
+    
 
     export default {
         name: 'ck',
@@ -31,15 +34,21 @@
                         LinkPlugin,
                         ParagraphPlugin,
                         AutoLink,
-                        ClickObserver
+                        List,
+                        CreateDictionary
                     ],
 
                     toolbar: {
                         items: [
                             'bold',
                             'italic',
+                            '|',
                             'undo',
-                            'redo'
+                            'redo',
+                            '|',
+                            'numberedList',
+                            'bulletedList',
+                            'createDict'
                         ]
                     }
                 }

@@ -262,10 +262,10 @@ export default class LinkUI extends Plugin {
 				//this._showUI();
 				// TODO INSERT CODIGO OPEN FILE
 				
-				console.log("asdddd", this.editor.commands.get( 'link' ).value)
+				const linkToFollow = this.editor.commands.get( 'link' ).value
 				//openFile("rama.html")
 				document.getElementById("filehandler").dispatchEvent(new CustomEvent("change", {
-					detail: { name: "rama.html" }}));
+					detail: { name: linkToFollow }}));
 				//console.log(element)
 				//element.dispatchEvent(new Event("change"));
 				

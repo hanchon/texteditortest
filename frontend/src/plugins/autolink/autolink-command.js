@@ -1,6 +1,6 @@
 import Plugin from '@ckeditor/ckeditor5-core/src/plugin';
 
-import { isUrlEmail, createLinkElement, mergeNodes } from './utils';
+import { dictExists, createLinkElement, mergeNodes } from './utils';
 
 export default class AutoLinkCommand extends Plugin {
 	static get pluginName() { return 'AutoLinkCommand'; }
@@ -35,7 +35,7 @@ export default class AutoLinkCommand extends Plugin {
 		const dataArr = nodesMerged.split( ' ' );
 		const url = dataArr[ dataArr.length - 1 ];
 
-		if ( !isUrlEmail( url ) ) {
+		if ( !dictExists( url )  ) {
 			return;
 		}
 

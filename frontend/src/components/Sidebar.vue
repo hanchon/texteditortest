@@ -47,7 +47,7 @@ export default {
 
     // directory
     // https://github.com/robogeek/vue-file-tree
-    this.$refs.filetree.addPathToTree("Directory", "dir", true);
+    //this.$refs.filetree.addPathToTree("Directory", "dir", true);
     this.files.forEach((element) => {
       this.$refs.filetree.addPathToTree(element, "", false);
     });
@@ -63,7 +63,8 @@ export default {
         "http://127.0.0.1:8000/open_file/" + node.data.pathname
       );
       await response.json();
-      this.$parent.openFile(node.data.pathname);
+      console.log("path", node.data.pathname)
+      this.$parent.openFile({'path':node.data.pathname});
     },
   },
 };

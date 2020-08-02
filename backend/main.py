@@ -2,6 +2,7 @@ import os
 from typing import Optional
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+import glob
 
 app = FastAPI()
 
@@ -25,6 +26,23 @@ app.add_middleware(
 def read_root():
     return {"Hello": "World"}
 
+def getListOfFiles(dirName):
+    # create a list of file and sub directories 
+    # names in the given directory 
+    listOfFile = os.listdir(dirName)
+    allFiles = list()
+    # Iterate over all the entries
+    for entry in listOfFile:
+        # Create full path
+        fullPath = os.path.join(dirName, entry)
+        # If entry is a directory then get the list of files in this directory 
+        if os.path.isdir(fullPath):
+            allFiles = allFiles + getListOfFiles(fullPath)
+        else:
+            allFiles.append(fullPath)
+                
+    return allFiles
+
 @app.get("/dir")
 def dir():
     try:
@@ -32,7 +50,8 @@ def dir():
     except Exception:
         # Note: we are already in the tests folder
         pass
-    arr = os.listdir()
+    #arr = [os.path.join(dp, f) for dp, dn, fn in os.walk(os.path.expanduser("~/files")) for f in fn]
+    arr =  getListOfFiles(".")
     res = {'data': arr}
     open_files.add(arr[1])
     print(res)
@@ -41,6 +60,7 @@ def dir():
 
 @app.get("/open_file/{filename}")
 def open_file(filename: str):
+    print ("open ", filename)
     open_files.add(filename)
     return {'res': True}
 

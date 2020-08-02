@@ -37,10 +37,7 @@ export default class CreateDictionary extends Plugin {
                         depth += 1
                     
                 }
-                console.log(read)
-                //console.log(content['_children'][0]['_textData']);
-                console.log(content);
-                
+                console.log(read)                
             } );
 
             return view;

@@ -1,6 +1,6 @@
 <template>
     <div id="ck">
-        <ckeditor :editor="editor" v-model="editorData" :config="editorConfig" @ready="onReady" ></ckeditor>
+        <ckeditor :editor="editor" v-model="editorData" :config="editorConfig" @ready="onReady" @input="onEditorInput"></ckeditor>
     </div>
 </template>
 
@@ -59,14 +59,16 @@
           this.$on("change", this.onReady);
         },
         methods: {
-          update: function () {
+          onEditorInput: function () {
             // pass updated content back to the parent
-            this.$emit("input", { content: this.content, file: this.file });
+            this.$emit("input", { content: this.editorData, file: this.file });
           },
           update_text: function (obj) {
-            console.log(this.editorData)
+            
+            console.log('update text', this.editorData)
             this.editorData = obj.text;
             this.file = obj.file;
+            this.$emit("update", { content: this.editorData, file: this.file });
           },
           onReady( editor )  {
                 // Insert the toolbar before the editable area.

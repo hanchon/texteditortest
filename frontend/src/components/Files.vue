@@ -2,9 +2,9 @@
   <div id="filehandler" v-on:change="openFileDic">
     <b-nav tabs>
       <b-nav-item>Create new file</b-nav-item>
-      <b-nav-item v-for="file in this.files" v-bind:key="file">
-        <span @click="openFile(file)">{{file}}</span>
-        <button @click="closeFile(file)">(close)</button>
+      <b-nav-item v-for="file in this.files" v-bind:key="file" @click="openFile(file)">
+        <span >{{file.replace(/^.*[\\\/]/, '')}}</span>
+        <button @click="closeFile(file)" v-on:click.stop>x</button>
       </b-nav-item>
     </b-nav>
   </div>
@@ -12,6 +12,7 @@
 
 
 <script>
+//var filename = fullPath.replace(/^.*[\\\/]/, '')
 export default {
   data() {
     return {
@@ -19,25 +20,29 @@ export default {
     };
   },
   async created() {
+    this.$parent.$on("opening_file", this.openingFile);
     const response = await fetch("http://127.0.0.1:8000/opened_files");
     const data = await response.json();
     this.files = data.files;
+    console.log ('opned files ', this.files)
     this.fetching = false;
   },
   methods: {
     async closeFile(file) {
+      let index = this.files.indexOf(file)
+      this.files.splice(index, 1);
       const response = await fetch("http://127.0.0.1:8000/close_file/" + file);
       const data = await response.json();
       return data;
     },
     async openFile(item) {
-      console.log(item)
+      console.log('open file files', item)
       const response = await fetch("http://127.0.0.1:8000/open_file/" + item);
       const data = await response.json();
       this.$parent.openFile(item);
       console.log(data);
     },
-      async openFileDic(item) {
+    async openFileDic(item) {
       const name = item.detail.name
       console.log(name)
       
@@ -46,6 +51,10 @@ export default {
       this.$parent.openFile(name);
       console.log(data);
     },
+    openingFile(file) {
+      if (!this.files.includes(file))
+        this.files.push(file)
+    }
   },
   mounted: async function () {
     window.setInterval(async () => {

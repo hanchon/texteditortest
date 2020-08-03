@@ -1,7 +1,7 @@
 <template>
   <div class="main-content">
     <Files />
-    <Texto v-model="data" />
+    <Texto v-model="editorData" @input='update' />
   </div>
 </template>
 
@@ -15,27 +15,42 @@ export default {
     Files,
   },
   data: function () {
-    return { data: {content:"", file:""} };
+    return { data: {content:"", file:""}, editorData:'a' };
   },
   created: async function () {
     this.$parent.$on("open_file", this.openFile);
   },
   methods: {
     async openFile(file) {
+      
       if (file!=""){
-        console.log("asdasdasd"+ this.data.content)
-        const response = await fetch("http://127.0.0.1:8000/store_file/" + file + "/" + this.data.content);
-        const data = await response.json();
-        console.log(data)
+        console.log('openingfile')
+        this.$emit("opening_file", file);
+        let filepost = {name:this.data.file,content:this.data.content}
+        let settings = {
+          method: 'POST',
+          headers: {
+              Accept: 'application/json',
+              'Content-Type': 'application/json',
+          },
+          body:JSON.stringify(filepost)
+        }
+        const response1 = await fetch("http://127.0.0.1:8000/save_filepost/", settings);
+        const data1 = await response1.json();
+        console.log(data1)
       }
       const response = await fetch("http://127.0.0.1:8000/get_file/" + file);
       const data = await response.json();
-      if (data.raw) {
-        this.$emit("update_text", { text: data.raw, file: file });
-        this.data.content = data.raw
-        this.data.content = file
-      }
+      
+      this.$emit("update_text", { text: data.raw, file: file });
+      this.data.content = data.raw
+      this.data.file = file
+      
     },
+    update(text){
+      this.data.content = text.content
+      console.log('content     ', text)
+    }
   },
 };
 </script>

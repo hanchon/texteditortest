@@ -2,10 +2,11 @@ import os
 from typing import Optional
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-import glob
+from pydantic import BaseModel
 
 app = FastAPI()
 
+# TODO dont mantain order
 open_files = set()
 
 origins = [
@@ -21,6 +22,26 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+
+
+class FilePost(BaseModel):
+    name: str
+    content: str
+
+
+@app.post("/save_filepost/")
+async def save_file(filepost: FilePost):
+    
+    print (filepost.name)
+    print (filepost.content)
+    try:
+        file = open(filepost.name, 'w')
+        file.write(filepost.content)
+        file.close()
+        return {'raw': True}
+    except Exception as e:
+        print (e)
+        return {'raw': False}
 
 @app.get("/")
 def read_root():
@@ -53,42 +74,40 @@ def dir():
     #arr = [os.path.join(dp, f) for dp, dn, fn in os.walk(os.path.expanduser("~/files")) for f in fn]
     arr =  getListOfFiles(".")
     res = {'data': arr}
-    open_files.add(arr[1])
-    print(res)
-    print(open_files)
     return res
 
-@app.get("/open_file/{filename}")
-def open_file(filename: str):
-    print ("open ", filename)
-    open_files.add(filename)
+@app.get("/open_file/{file_path:path}")
+def open_file(file_path: str):
+    open_files.add(file_path)
     return {'res': True}
 
-@app.get('/get_file/{filename}')
-def get_file(filename: str):
+@app.get('/get_file/{file_path:path}')
+def get_file(file_path: str):
     data = ""
+    print ("get_file ", file_path)
     try:
-        file = open("./"+filename)
+        file = open(file_path)
         data = file.read()
         file.close()
         return {'raw': data}
-    except Exception:
+    except Exception as e:
+        print (e)
         return {'raw': data}
 
 #TODO: allow links in the data str
 @app.get('/save_file/{filename}/{data}')
 def save_file(filename: str, data:str):
     try:
-        file = open("./"+filename)
+        file = open(filename)
         file.write(data)
         file.close()
         return {'raw': True}
     except Exception:
         return {'raw': False}
 
-@app.get("/close_file/{filename}")
-def close_file(filename: str):
-    open_files.remove(filename)
+@app.get("/close_file/{file_path:path}")
+def close_file(file_path: str):
+    open_files.remove(file_path)
     return {'res': True}
 
 @app.get('/opened_files')

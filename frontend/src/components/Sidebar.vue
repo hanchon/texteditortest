@@ -55,16 +55,17 @@ export default {
   methods: {
     async openFile(event, node) {
       // console.log(event);
-      // console.log(node.data);
+      if (node.isLeaf) {
       // console.log(node.title);
       // console.log(node.data.pathname);
-    
-      const response = await fetch(
-        "http://127.0.0.1:8000/open_file/" + node.data.pathname
-      );
-      await response.json();
-      console.log("path", node.data.pathname)
-      this.$parent.openFile({'path':node.data.pathname});
+        this.$parent.openFile(node.data.pathname);
+        const response = await fetch(
+          "http://127.0.0.1:8000/open_file/" + node.data.pathname
+        );
+        await response.json();
+        console.log("path", node.data.pathname)
+        
+      }
     },
   },
 };

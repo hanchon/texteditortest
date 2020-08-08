@@ -3,6 +3,7 @@ import imageIcon from '@ckeditor/ckeditor5-core/theme/icons/image.svg';
 import ButtonView from '@ckeditor/ckeditor5-ui/src/button/buttonview';
 import AddToDictCommand from './addtodictcommand' 
 
+
 export default class CreateDictionary extends Plugin {
     init() {
         const editor = this.editor;
@@ -41,6 +42,15 @@ export default class CreateDictionary extends Plugin {
                     
                 }
                 console.log(read)
+                if (read) {
+                    localStorage[read] = read + '.html'
+                    
+                    //editor.execute( 'input', { text: ' ' } );
+                    //editor.editing.view.focus();
+                    document.getElementById("app").dispatchEvent(new CustomEvent("updateDict", {
+                        detail: { name: read + '.html' }}));
+
+                }
                              
             } );
 

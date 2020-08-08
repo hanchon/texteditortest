@@ -16,6 +16,7 @@
     "@ckeditor/ckeditor5-link": "^21.0.0",
     "@ckeditor/ckeditor5-list": "^21.0.0",
     "@ckeditor/ckeditor5-paragraph": "^21.0.0",
+    "@ckeditor/ckeditor5-special-characters": "^21.0.0",
     "@ckeditor/ckeditor5-theme-lark": "^21.0.0",
     "@ckeditor/ckeditor5-vue": "^1.0.1",
     "@tinymce/tinymce-vue": "^3.2.2",

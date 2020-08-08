@@ -17,6 +17,9 @@ export default {
     Content,
     Sidebar,
   },
+  async created() {
+    this.$parent.$on("open_file", this.openFile)
+  },
   methods: {
     openFile(file) {
       this.$emit("open_file", file);

@@ -1,6 +1,6 @@
 <template>
     <div id="ck">
-        <ckeditor :editor="editor" v-model="editorData" :config="editorConfig" @ready="onReady" @input="onEditorInput"></ckeditor>
+        <ckeditor :editor="editor" v-model="editorData" :config="editorConfig" @ready="onReady" @input="onEditorInput" ></ckeditor>
     </div>
 </template>
 
@@ -14,10 +14,11 @@
     import ItalicPlugin from '@ckeditor/ckeditor5-basic-styles/src/italic';
     import LinkPlugin from '../plugins/ckeditor5-link/src/link';
     import ParagraphPlugin from '@ckeditor/ckeditor5-paragraph/src/paragraph';
-    import AutoLink from '../plugins/autolink/autolink';
+    //import AutoLink from '../plugins/autolink/autolink';
     //import AddToDict from '../plugins/addtodict/addtodict';
     import List from '@ckeditor/ckeditor5-list/src/list';
     import CreateDictionary from '../plugins/addtodict/createDictionary';
+    import AutoLink from '../plugins/ckeditor5-link/src/autolink';
     
 
     export default {
@@ -56,7 +57,7 @@
         },
         created: async function () {
           this.$parent.$on("update_text", this.update_text);
-          this.$on("change", this.onReady);
+          this.$on("change", this.onReady);          
         },
         methods: {
           onEditorInput: function () {

@@ -13,7 +13,7 @@ import getLastTextLine from '@ckeditor/ckeditor5-typing/src/utils/getlasttextlin
 
 const MIN_LINK_LENGTH_WITH_SPACE_AT_END = 4; // Ie: "t.co " (length 5).
 
-// This was tweak from https://gist.github.com/dperini/729294.
+/*// This was tweak from https://gist.github.com/dperini/729294.
 const URL_REG_EXP = new RegExp(
 	// Group 1: Line start or after a space.
 	'(^|\\s)' +
@@ -48,7 +48,7 @@ const URL_REG_EXP = new RegExp(
 	')$', 'i' );
 
 const URL_GROUP_IN_MATCH = 2;
-
+*/
 // Simplified email test - should be run over previously found URL.
 const EMAIL_REG_EXP = /^[\S]+@((?![-_])(?:[-\w\u00a1-\uffff]{0,63}[^-_]\.))+(?:[a-z\u00a1-\uffff]{2,})$/i;
 
@@ -104,7 +104,7 @@ export default class AutoLink extends Plugin {
 
 			// 2. Check text before last typed "space".
 			const url = getUrlAtTextEnd( text.substr( 0, text.length - 1 ) );
-
+			console.log("watcher ", url)
 			if ( url ) {
 				return { url };
 			}
@@ -120,11 +120,11 @@ export default class AutoLink extends Plugin {
 			}
 
 			const linkEnd = range.end.getShiftedBy( -1 ); // Executed after a space character.
-			const linkStart = linkEnd.getShiftedBy( -url.length );
+			const linkStart = linkEnd.getShiftedBy( -url['key'].length );
 
 			const linkRange = editor.model.createRange( linkStart, linkEnd );
-
-			this._applyAutoLink( url, linkRange );
+			console.log("__autolink")
+			this._applyAutoLink( url['url'], linkRange );
 		} );
 
 		watcher.bind( 'isEnabled' ).to( this );
@@ -192,7 +192,7 @@ export default class AutoLink extends Plugin {
 	_checkAndApplyAutoLinkOnRange( rangeToCheck ) {
 		const model = this.editor.model;
 		const { text, range } = getLastTextLine( rangeToCheck, model );
-
+		console.log("zxczxc", url )
 		const url = getUrlAtTextEnd( text );
 
 		if ( url ) {
@@ -234,9 +234,37 @@ function isSingleSpaceAtTheEnd( text ) {
 }
 
 function getUrlAtTextEnd( text ) {
-	const match = URL_REG_EXP.exec( text );
-
-	return match ? match[ URL_GROUP_IN_MATCH ] : null;
+	console.log("getUrlAtTextEnd", text)
+	
+	var URL_REG_EXP;
+	for (let i=0; i < localStorage.length; i++){
+        let key = localStorage.key(i)
+		URL_REG_EXP = new RegExp(key, 'g')
+		/*let match = URL_REG_EXP.exec( text );
+		if (match){
+			console.log("match ", text.length, " ", key.length, " ", match.index)
+			if (text.length - key.length  == match.index){
+				return {"key":key, "url":localStorage[key]}	
+			}	 
+		}*/
+		let arraymatch
+		while ((arraymatch = URL_REG_EXP.exec( text )) !== null) {
+			console.log(`Found ${arraymatch[0]}. Next starts at ${URL_REG_EXP.lastIndex}.`);
+			if (text.length  == URL_REG_EXP.lastIndex){
+				return {"key":key, "url":localStorage[key]}	
+			}
+			// expected output: "Found foo. Next starts at 9."
+			// expected output: "Found foo. Next starts at 19."
+		}
+	}
+	return null 
+	/*const match = URL_REG_EXP.exec( text );
+	console.log("getUrlAtTextEnd", match)
+	return match ? match[ URL_GROUP_IN_MATCH ] : null;*/
+	
+	/*if (localStorage[text] != undefined)
+		return localStorage[text]
+	return null;*/
 }
 
 function isEmail( linkHref ) {
@@ -246,3 +274,9 @@ function isEmail( linkHref ) {
 function isLinkAllowedOnRange( range, model ) {
 	return model.schema.checkAttributeInSelection( model.createSelection( range ), 'linkHref' );
 }
+/*
+function dictExists( url ) {
+	if (localStorage[url] != undefined)
+		return true
+	return false
+}*/

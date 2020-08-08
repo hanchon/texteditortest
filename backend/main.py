@@ -28,6 +28,27 @@ class FilePost(BaseModel):
     name: str
     content: str
 
+@app.get("/open_project")
+async def open_project():
+    try:
+        os.chdir("./tests/")
+    except Exception:
+        # Note: we are already in the tests folder
+        pass
+    try:
+        file = open('.dict', 'r')
+    except Exception as e:
+        print (e)
+        file = open('.dict', 'w')
+    try:
+        data = file.read()
+        print (data)
+        file.close()
+        return {'raw': data}
+    except Exception as e:
+        print (e)
+        return {'raw': data}
+
 
 @app.post("/save_filepost/")
 async def save_file(filepost: FilePost):
@@ -90,9 +111,42 @@ def get_file(file_path: str):
         data = file.read()
         file.close()
         return {'raw': data}
+    except FileNotFoundError:
+        file = open(file_path, 'w+')
+        data = file.read()
+        open_files.add(file_path)
+        file.close()
+        return {'raw': data}
     except Exception as e:
         print (e)
         return {'raw': data}
+
+@app.get('/create_file/{file_path:path}')
+def create_file(file_path: str):
+    data = ""
+    print ("create_file ", file_path)
+    try:
+        if not os.path.isfile(file_path):
+            file = open(file_path, "w+")
+            data = file.read()
+            open_files.add(file_path)
+            file.close()
+            return {'raw': data}
+    except Exception as e:
+        print (e)
+        return {'raw': data}
+
+@app.get('/create_directory/{file_path:path}')
+def create_directory(file_path: str):
+    print ("create_directory ", file_path)
+    try:
+        if not os.path.exists(file_path):
+            os.mkdir(file_path)
+            return {'result': True}
+    except OSError as error: 
+        print(error)
+        return {'result': False}
+
 
 #TODO: allow links in the data str
 @app.get('/save_file/{filename}/{data}')

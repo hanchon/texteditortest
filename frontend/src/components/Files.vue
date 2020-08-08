@@ -1,7 +1,7 @@
 <template>
   <div id="filehandler" v-on:change="openFileDic">
     <b-nav tabs>
-      <b-nav-item>Create new file</b-nav-item>
+      <b-nav-item @click="createFile">Create new file</b-nav-item>
       <b-nav-item v-for="file in this.files" v-bind:key="file" @click="openFile(file)">
         <span >{{file.replace(/^.*[\\\/]/, '')}}</span>
         <button @click="closeFile(file)" v-on:click.stop>x</button>
@@ -54,6 +54,9 @@ export default {
     openingFile(file) {
       if (!this.files.includes(file))
         this.files.push(file)
+    },
+    createFile(){
+      this.$parent.$parent.$parent.createFile("")
     }
   },
   mounted: async function () {

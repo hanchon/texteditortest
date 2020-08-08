@@ -1,8 +1,8 @@
 <template>
-  <div>
+  <div  @contextmenu.prevent="">
     <!-- <b-button v-b-toggle.sidebar-1>Explore Files</b-button> -->
     <!-- <b-sidebar id="sidebar-1" title="Sidebar" shadow> -->
-    <div class="sidebar-test">
+    <div class="sidebar-test" >
       <p v-if="this.fetching">Fetching files...</p>
       <!-- <ul v-else>
         <li v-for="item in this.files" v-bind:key="item">
@@ -16,10 +16,10 @@
       <!-- <div @click="doDashboard">Dashboard</div>
       <div @click="doCustomers">Customers</div>-->
 
-      <file-browser-tree id="file-tree" ref="filetree" class="column" @nodeClick="openFile">
+      <file-browser-tree id="file-tree" ref="filetree" class="column" @nodeClick="openFile" >
         <template slot="context-menu">
-          <div>Dashboard</div>
-          <div>Customers</div>
+          <div @click='createFile'>Create File</div>
+          <div @click='createDirectory'>Create Directory</div>
         </template>
       </file-browser-tree>
     </div>
@@ -37,9 +37,11 @@ export default {
     return {
       files: [],
       fetching: true,
+      node: null,
+      componentKey:0
     };
   },
-  async created() {
+  async mounted() {
     const response = await fetch("http://127.0.0.1:8000/dir");
     const data = await response.json();
     this.files = data.data;
@@ -51,10 +53,13 @@ export default {
     this.files.forEach((element) => {
       this.$refs.filetree.addPathToTree(element, "", false);
     });
+
+    this.$parent.$parent.$on("reload", this.reload);
   },
   methods: {
     async openFile(event, node) {
       // console.log(event);
+      this.node = node
       if (node.isLeaf) {
       // console.log(node.title);
       // console.log(node.data.pathname);
@@ -67,6 +72,19 @@ export default {
         
       }
     },
+
+    async createFile(){
+      console.log('createFile', this.node)
+      this.$parent.$parent.createFile(this.node.data.pathname);
+
+    },
+    async createDirectory(){
+      console.log('createDirectory', this.node.data.pathname)
+      this.$parent.$parent.createDirectory(this.node.data.pathname);
+    },
+    async reload(){
+      console.log("reload ")
+    }
   },
 };
 </script>

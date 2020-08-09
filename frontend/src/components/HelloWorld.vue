@@ -1,13 +1,13 @@
 <template>
   <div class="hello">
-    <Sidebar />
-    <Content />
+    <Sidebar class="side"/>
+    <Content class="cont"/>
   </div>
 </template>
 
 <script>
 import Content from "./Content.vue";
-import Sidebar from "./Sidebar.vue";
+import Sidebar from "./Tree.vue";
 export default {
   name: "HelloWorld",
   // props: {
@@ -44,4 +44,12 @@ li {
 a {
   color: #42b983;
 }
+
+.side {
+  z-index: 1000;
+}
+.cont {
+  z-index: 1;
+}
+
 </style>

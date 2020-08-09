@@ -3,7 +3,7 @@ from typing import Optional
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
-
+import json
 app = FastAPI()
 
 # TODO dont mantain order
@@ -71,18 +71,20 @@ def read_root():
 def getListOfFiles(dirName):
     # create a list of file and sub directories 
     # names in the given directory 
+   
     listOfFile = os.listdir(dirName)
     allFiles = list()
+    
     # Iterate over all the entries
     for entry in listOfFile:
         # Create full path
         fullPath = os.path.join(dirName, entry)
         # If entry is a directory then get the list of files in this directory 
         if os.path.isdir(fullPath):
-            allFiles = allFiles + getListOfFiles(fullPath)
+            #allFiles = allFiles + getListOfFiles(fullPath)
+            allFiles.append({'title':entry, 'data':{'fullPath':fullPath } , 'isLeaf': False, 'children':getListOfFiles(fullPath)})
         else:
-            allFiles.append(fullPath)
-                
+            allFiles.append({'title':entry, 'data':{'fullPath':fullPath } ,'isLeaf': True})         
     return allFiles
 
 @app.get("/dir")

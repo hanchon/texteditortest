@@ -1,5 +1,5 @@
 <template>
-  <div class="main-content">
+  <div class="main-content" >
     <Files />
     <Texto v-model="editorData" @input='update' />
   </div>
@@ -56,11 +56,13 @@ export default {
 </script>
 
 
-<style scoped>
+<style>
 .main-content {
+  position: relative;
   width: 85.5%;
-  display: block;
-  float: left;
   margin-left: 14.5%;
+  z-index:1;
 }
+
+
 </style>

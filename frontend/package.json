@@ -25,7 +25,9 @@
     "core-js": "^3.6.5",
     "postcss-loader": "^3.0.0",
     "raw-loader": "^0.5.1",
+    "sl-vue-tree": "^1.8.4",
     "vue": "^2.6.11",
+    "vue-awesome": "^4.1.0",
     "vue-file-tree": "github:robogeek/vue-file-tree"
   },
   "devDependencies": {

@@ -1,8 +1,8 @@
 <template>
   <div id="filehandler" v-on:change="openFileDic">
     <b-nav tabs>
-      <b-nav-item @click="createFile">Create new file</b-nav-item>
-      <b-nav-item v-for="file in this.files" v-bind:key="file" @click="openFile(file)">
+      <b-nav-item class="filetab" @click="createFile">Create new file</b-nav-item>
+      <b-nav-item class="filetab" v-for="file in this.files" v-bind:key="file" @click="openFile(file)">
         <span >{{file.replace(/^.*[\\\/]/, '')}}</span>
         <button @click="closeFile(file)" v-on:click.stop>x</button>
       </b-nav-item>
@@ -68,3 +68,14 @@ export default {
   },
 };
 </script>
+<style >
+  .filetab {
+    background-color: white;
+    color: black;
+    border-radius: 2px;
+    border-color: indigo;
+    cursor: pointer;
+    z-index:0;
+  }
+</style>
+  

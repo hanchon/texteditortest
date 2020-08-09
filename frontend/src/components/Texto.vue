@@ -1,5 +1,5 @@
 <template>
-    <div id="ck">
+    <div id="ck" class="ck-editor">
         <ckeditor :editor="editor" v-model="editorData" :config="editorConfig" @ready="onReady" @input="onEditorInput" ></ckeditor>
     </div>
 </template>
@@ -74,8 +74,16 @@
           onReady( editor )  {
                 // Insert the toolbar before the editable area.
                 console.log('ready', editor)
+                editor.ui.view.editable.element.style.minHeight = '100px'
                 
             },
         }
     };
 </script>
+
+<style>
+    .ck-editor{
+        position:relative;
+    }
+
+</style>

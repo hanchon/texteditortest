@@ -45,13 +45,17 @@ export default {
     const response = await fetch("http://127.0.0.1:8000/dir");
     const data = await response.json();
     this.files = data.data;
+
+    for (var f in this.files)
+      console.log(this.files[f]);
+
     this.fetching = false;
 
     // directory
     // https://github.com/robogeek/vue-file-tree
     //this.$refs.filetree.addPathToTree("Directory", "dir", true);
     this.files.forEach((element) => {
-      this.$refs.filetree.addPathToTree(element, "", false);
+      this.$refs.filetree.addPathToTree(element.data.fullPath, "", false);
     });
 
     this.$parent.$parent.$on("reload", this.reload);
@@ -89,7 +93,7 @@ export default {
 };
 </script>
 
-<style scoped>
+<style>
 .sidebar-test {
   width: 14%;
   display: block;

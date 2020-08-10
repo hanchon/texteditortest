@@ -1,11 +1,13 @@
 <template>
   <div id="filehandler" v-on:change="openFileDic">
     <b-nav tabs>
-      <b-nav-item class="filetab" @click="createFile">Create new file</b-nav-item>
+      
       <b-nav-item class="filetab" v-for="file in this.files" v-bind:key="file" @click="openFile(file)">
-        <span >{{file.replace(/^.*[\\\/]/, '')}}</span>
+        <span >{{file.replace(/^.*[\\\/]/, '')}} </span>
+        <span >  </span>
         <button @click="closeFile(file)" v-on:click.stop>x</button>
       </b-nav-item>
+      <b-nav-item class="filetab" @click="createFile">+</b-nav-item>
     </b-nav>
   </div>
 </template>
@@ -52,11 +54,13 @@ export default {
       console.log(data);
     },
     openingFile(file) {
-      if (!this.files.includes(file))
+      console.log("openining", file)
+      console.log(this.files)
+      if (!this.files.includes(file.replace('./','')))
         this.files.push(file)
     },
     createFile(){
-      this.$parent.$parent.$parent.createFile("")
+      this.$parent.$parent.$parent.createFile({'name':"", 'complete':false})
     }
   },
   mounted: async function () {

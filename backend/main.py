@@ -4,6 +4,8 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 import json
+import shutil
+
 app = FastAPI()
 
 # TODO dont mantain order
@@ -77,14 +79,15 @@ def getListOfFiles(dirName):
     
     # Iterate over all the entries
     for entry in listOfFile:
-        # Create full path
-        fullPath = os.path.join(dirName, entry)
-        # If entry is a directory then get the list of files in this directory 
-        if os.path.isdir(fullPath):
-            #allFiles = allFiles + getListOfFiles(fullPath)
-            allFiles.append({'title':entry, 'data':{'fullPath':fullPath } , 'isLeaf': False, 'children':getListOfFiles(fullPath)})
-        else:
-            allFiles.append({'title':entry, 'data':{'fullPath':fullPath } ,'isLeaf': True})         
+        if entry != ".dict":                
+            # Create full path
+            fullPath = os.path.join(dirName, entry)
+            # If entry is a directory then get the list of files in this directory 
+            if os.path.isdir(fullPath):
+                #allFiles = allFiles + getListOfFiles(fullPath)
+                allFiles.append({'title':entry, 'data':{'fullPath':fullPath } , 'isLeaf': False, 'children':getListOfFiles(fullPath)})
+            else:
+                allFiles.append({'title':entry, 'data':{'fullPath':fullPath } ,'isLeaf': True})         
     return allFiles
 
 @app.get("/dir")
@@ -173,3 +176,17 @@ def opened_files():
 @app.get("/items/{item_id}")
 def read_item(item_id: int, q: Optional[str] = None):
     return {"item_id": item_id, "q": q}
+
+
+@app.get("/remove_file/{file_path:path}")
+def remove_file(file_path: str):
+    if file_path in open_files:
+        open_files.remove(file_path)
+    os.remove(file_path)
+    return {'res': True}
+
+@app.get("/remove_directory/{file_path:path}")
+def remove_directory(file_path: str):
+    #open_files.remove(file_path)
+    shutil.rmtree(file_path)
+    return {'res': True}

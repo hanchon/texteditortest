@@ -20,6 +20,7 @@
         <template slot="context-menu">
           <div @click='createFile'>Create File</div>
           <div @click='createDirectory'>Create Directory</div>
+          <div @click='addToDict'>Add to Dictionary</div>
         </template>
       </file-browser-tree>
     </div>
@@ -81,6 +82,10 @@ export default {
       console.log('createFile', this.node)
       this.$parent.$parent.createFile(this.node.data.pathname);
 
+    },
+    async createDirectory(){
+      console.log('createDirectory', this.node.data.pathname)
+      this.$parent.$parent.createDirectory(this.node.data.pathname);
     },
     async createDirectory(){
       console.log('createDirectory', this.node.data.pathname)

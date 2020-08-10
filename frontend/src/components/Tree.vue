@@ -1,7 +1,7 @@
 <template>
   <div id="treefile" class="sidebar-test" @contextmenu.prevent="" @click="contextMenuIsVisible = false">
 
-    <sl-vue-tree v-model="nodes" @nodeclick="nodeClick" @nodecontextmenu="nodecontextmenu" @drop="drop" >
+    <sl-vue-tree ref="slVueTree" v-model="nodes" @nodeclick="nodeClick" @nodecontextmenu="nodecontextmenu" @drop="drop" >
 
       <template slot="toggle" slot-scope="{ node }">
           <span v-if="!node.isLeaf">
@@ -20,6 +20,8 @@
   <div class="contextmenu" ref="contextmenu" v-show="contextMenuIsVisible">
       <div @click="createFile">Create File</div>
       <div @click="createDirectory">Create Directory</div>
+      <div @click='addToDict'>Add to Dictionary</div>
+      <div @click='remove'>Delete</div>
   </div>
   
   </div>
@@ -58,7 +60,8 @@ export default {
       }
     },
     async nodecontextmenu(node) {
-      this.node = node
+      this.node = node;
+      this.$refs.slVueTree.select(node.path);
       this.contextMenuIsVisible = true;
       const $contextMenu = this.$refs.contextmenu;
       $contextMenu.style.left = (event.clientX) + 'px';
@@ -75,7 +78,7 @@ export default {
       var path = this.node.data.fullPath
       if (this.node.isLeaf)
         path = path.substring(0, path.lastIndexOf("/"));
-      this.$parent.$parent.createFile(path);
+      this.$parent.$parent.createFile({'name': path, 'complete': false });
 
     },
     async createDirectory(){
@@ -92,7 +95,28 @@ export default {
       const response = await fetch("http://127.0.0.1:8000/dir");
       const data = await response.json();
       this.nodes = data.data;
-    }
+    },
+    async addToDict(){
+      this.contextMenuIsVisible = false;
+      console.log("add to dict ")
+      if (this.node.isLeaf) {
+        var person = prompt("Dir name", "");
+        if (person == null || person == "") {
+          return;
+        }
+        localStorage[person] = this.node.data.fullPath
+        var file = {'detail':{'name': this.node.data.fullPath, 'complete': true }};
+        this.$parent.$parent.updateDict(file)
+      } 
+    },
+    async remove(){
+      this.contextMenuIsVisible = false;
+      console.log("remove ")
+      var file = this.node.data.fullPath;
+      if (this.node.isLeaf)
+        this.$parent.$parent.removeFile(file)
+      else this.$parent.$parent.removeDir(file)
+    },
   }
 }
 </script>

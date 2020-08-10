@@ -45,16 +45,20 @@ export default {
       const data1 = await response1.json();
       console.log(data1, file.detail.name)
 
-      await this.createFile(file.detail.name);
+      await this.createFile(file.detail);
     },
     async createFile(file) {
-      var person = prompt("File name","");
-      console.log("person ", person)
-      if (person == null || person == "") {
-        return;
+      var person = ''
+      if (!file.complete) {
+        person = prompt("File name","");
+        if (file.name == "")
+          file.name = "."
+        if (person == null || person == "") {
+          return;
+        }
       }
       console.log("App ", file, person)
-      const response = await fetch("http://127.0.0.1:8000/create_file/"+file+"/"+person);
+      const response = await fetch("http://127.0.0.1:8000/create_file/"+file.name+"/"+person);
       await response.json();
       this.$emit("reload");
     },
@@ -66,7 +70,19 @@ export default {
       const response = await fetch("http://127.0.0.1:8000/create_directory/"+dir+"/"+person);
       await response.json();
       this.$emit("reload");
+    },
+    async removeFile(file){
+      const response = await fetch("http://127.0.0.1:8000/remove_file/"+file);
+      await response.json();
+      this.$emit("reload");
+    },
+    async removeDir(dir){
+      const response = await fetch("http://127.0.0.1:8000/remove_directory/"+dir);
+      await response.json();
+      this.$emit("reload");
     }
+
+
   }
 }
 </script>

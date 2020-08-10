@@ -14,11 +14,16 @@
     import ItalicPlugin from '@ckeditor/ckeditor5-basic-styles/src/italic';
     import LinkPlugin from '../plugins/ckeditor5-link/src/link';
     import ParagraphPlugin from '@ckeditor/ckeditor5-paragraph/src/paragraph';
+    import ImagePlugin from '@ckeditor/ckeditor5-image/src/image';
+    import ImageStylePlugin from '@ckeditor/ckeditor5-image/src/imagestyle';
+    import ImageResizePlugin from '@ckeditor/ckeditor5-image/src/imageresize';
+    //import ImageToolbar from '@ckeditor/ckeditor5-image/src/imagetoolbar';
     //import AutoLink from '../plugins/autolink/autolink';
     //import AddToDict from '../plugins/addtodict/addtodict';
     import List from '@ckeditor/ckeditor5-list/src/list';
     import CreateDictionary from '../plugins/addtodict/createDictionary';
     import AutoLink from '../plugins/ckeditor5-link/src/autolink';
+    import Heading from '@ckeditor/ckeditor5-heading/src/heading';
     
 
     export default {
@@ -36,11 +41,16 @@
                         ParagraphPlugin,
                         AutoLink,
                         List,
-                        CreateDictionary
+                        CreateDictionary,
+                        ImagePlugin,
+                        ImageStylePlugin,
+                        ImageResizePlugin,
+                        Heading
                     ],
 
                     toolbar: {
                         items: [
+                            'heading',
                             'bold',
                             'italic',
                             '|',
@@ -49,9 +59,10 @@
                             '|',
                             'numberedList',
                             'bulletedList',
-                            'createDict'
+                            'createDict',
+                            'imageStyle:side',
                         ]
-                    }
+                    },
                 }
             };
         },

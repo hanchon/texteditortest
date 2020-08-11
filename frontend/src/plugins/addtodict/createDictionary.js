@@ -48,7 +48,7 @@ export default class CreateDictionary extends Plugin {
                     //editor.execute( 'input', { text: ' ' } );
                     //editor.editing.view.focus();
                     document.getElementById("app").dispatchEvent(new CustomEvent("updateDict", {
-                        detail: { name: read + '.html' }}));
+                        detail: { 'name': read + '.html', 'complete': true }}));
 
                 }
                              

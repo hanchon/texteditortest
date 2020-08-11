@@ -19,6 +19,7 @@ export default {
   data() {
     return {
       files: [],
+      tab: ""
     };
   },
   async created() {
@@ -35,6 +36,8 @@ export default {
       this.files.splice(index, 1);
       const response = await fetch("http://127.0.0.1:8000/close_file/" + file);
       const data = await response.json();
+      if (this.files.length > 0)
+        this.openFile(this.files[0])
       return data;
     },
     async openFile(item) {
@@ -42,6 +45,8 @@ export default {
       const response = await fetch("http://127.0.0.1:8000/open_file/" + item);
       const data = await response.json();
       this.$parent.openFile(item);
+      this.tab = item
+      console.log("new tab", this.tab)
       console.log(data);
     },
     async openFileDic(item) {
@@ -56,8 +61,11 @@ export default {
     openingFile(file) {
       console.log("openining", file)
       console.log(this.files)
-      if (!this.files.includes(file.replace('./','')))
-        this.files.push(file)
+      let short = file.replace('./','')
+      if (!this.files.includes(short)){
+        this.files.push(short)
+      }
+      this.tab = short
     },
     createFile(){
       this.$parent.$parent.$parent.createFile({'name':"", 'complete':false})

@@ -1,5 +1,5 @@
 <template>
-  <div id="app" @updateDict='updateDict'>
+  <div id="app" @updateDict='updateDict' @click="closeContext">
     <HelloWorld />
   </div>
 </template>
@@ -56,9 +56,10 @@ export default {
         if (person == null || person == "") {
           return;
         }
+        file.name = file.name +"/";
       }
       console.log("App ", file, person)
-      const response = await fetch("http://127.0.0.1:8000/create_file/"+file.name+"/"+person);
+      const response = await fetch("http://127.0.0.1:8000/create_file/"+file.name+person);
       await response.json();
       this.$emit("reload");
     },
@@ -80,6 +81,12 @@ export default {
       const response = await fetch("http://127.0.0.1:8000/remove_directory/"+dir);
       await response.json();
       this.$emit("reload");
+    },
+    async closeContext(){
+      this.$emit("closecontext");
+    },
+    async previewFiles(qwe){
+      console.log("butttt", qwe)
     }
 
 

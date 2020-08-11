@@ -39,10 +39,8 @@ export default class AddToDictCommand extends Command {
 		console.log(read)
 		if (read) {
 			localStorage[read] = read + '.html'
-			editor.execute( 'input', { text: ' ' } );
-			editor.editing.view.focus();
-			/*document.getElementById("app").dispatchEvent(new CustomEvent("updateDict", {
-				detail: { name: read + '.html' }}));*/
+			document.getElementById("app").dispatchEvent(new CustomEvent("updateDict", {
+				detail: { 'name': read + '.html', 'complete': true }}));
 
 		}
 	}

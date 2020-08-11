@@ -42,6 +42,7 @@ export default {
     await this.reload()
 
     this.$parent.$parent.$on("reload", this.reload);
+    this.$parent.$parent.$on("closecontext", this.closeContext);
   },
   methods: {
     async nodeClick(node) {
@@ -117,6 +118,9 @@ export default {
         this.$parent.$parent.removeFile(file)
       else this.$parent.$parent.removeDir(file)
     },
+    async closeContext() {
+      this.contextMenuIsVisible = false;
+    }
   }
 }
 </script>

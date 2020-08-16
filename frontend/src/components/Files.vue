@@ -1,11 +1,9 @@
 <template>
   <div id="filehandler" v-on:change="openFileDic">
-    <b-nav tabs>
-      
-      <b-nav-item class="filetab" v-for="file in this.files" v-bind:key="file" @click="openFile(file)">
-        <span >{{file.replace(/^.*[\\\/]/, '')}} </span>
-        <span >  </span>
-        <button @click="closeFile(file)" v-on:click.stop>x</button>
+    <b-nav tabs >
+      <b-nav-item class='filetab' v-for="file in this.files" v-bind:key="file" @click="openFile(file)"   v-bind:class="{'active':(tab === file)}">
+                <a> {{file.replace(/^.*[\\\/]/, '')}} </a>
+        <button class='filetab' @click="closeFile(file)" v-on:click.stop>x</button>
       </b-nav-item>
       <b-nav-item class="filetab" @click="createFile">+</b-nav-item>
     </b-nav>
@@ -14,21 +12,25 @@
 
 
 <script>
+
+//  :active='file === tab'
+//v-bind:style='{"background-color" : (file === tab? "orange" : "red" )}'
 //var filename = fullPath.replace(/^.*[\\\/]/, '')
 export default {
   data() {
     return {
       files: [],
-      tab: ""
+      tab: "",
+      active:false
     };
   },
   async created() {
     this.$parent.$on("opening_file", this.openingFile);
-    const response = await fetch("http://127.0.0.1:8000/opened_files");
+    /*const response = await fetch("http://127.0.0.1:8000/opened_files");
     const data = await response.json();
     this.files = data.files;
     console.log ('opned files ', this.files)
-    this.fetching = false;
+    this.fetching = false;*/
   },
   methods: {
     async closeFile(file) {
@@ -64,6 +66,7 @@ export default {
       let short = file.replace('./','')
       if (!this.files.includes(short)){
         this.files.push(short)
+        this.active = true
       }
       this.tab = short
     },
@@ -72,22 +75,31 @@ export default {
     }
   },
   mounted: async function () {
-    window.setInterval(async () => {
+    /*window.setInterval(async () => {
       const response = await fetch("http://127.0.0.1:8000/opened_files");
       const data = await response.json();
       this.files = data.files;
-    }, 1000);
+    }, 1000);*/
   },
 };
 </script>
-<style >
-  .filetab {
-    background-color: white;
-    color: black;
-    border-radius: 2px;
-    border-color: indigo;
-    cursor: pointer;
-    z-index:0;
-  }
+
+<style>
+/* Color not working, not overriding boostrap*/
+.filetab {
+  background-color: white;
+  color: black; 
+}
+
+.active {
+  background-color: lightgrey;
+  color: black;
+
+}
+
+.nav-item > a:hover {
+  color: grey;
+  background-color: white;
+}
+
 </style>
-  

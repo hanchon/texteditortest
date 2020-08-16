@@ -33,7 +33,7 @@ class FilePost(BaseModel):
 @app.get("/open_project")
 async def open_project():
     try:
-        os.chdir("./tests/")
+        os.chdir("./project/")
     except Exception:
         # Note: we are already in the tests folder
         pass
@@ -93,7 +93,7 @@ def getListOfFiles(dirName):
 @app.get("/dir")
 def dir():
     try:
-        os.chdir("./tests/")
+        os.chdir("./project/")
     except Exception:
         # Note: we are already in the tests folder
         pass

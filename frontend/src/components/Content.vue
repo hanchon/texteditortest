@@ -1,7 +1,8 @@
 <template>
-  <div class="main-content" >
+  <div class="main-content" v-bind:style="{ width: width + '%' }">
     <Files />
     <Texto v-model="editorData" @input='update' />
+    <button @click="changewidth"/>
   </div>
 </template>
 
@@ -15,7 +16,7 @@ export default {
     Files,
   },
   data: function () {
-    return { data: {content:"", file:""}, editorData:'a' };
+    return { data: {content:"", file:""}, editorData:'a', width: 85.5 };
   },
   created: async function () {
     this.$parent.$on("open_file", this.openFile);
@@ -50,6 +51,10 @@ export default {
     update(text){
       this.data.content = text.content
       console.log('content     ', text)
+    },
+    changewidth(){
+      this.width = 50;
+      console.log("qwe ")
     }
   },
 };

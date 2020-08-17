@@ -27,6 +27,7 @@
     "postcss-loader": "^3.0.0",
     "raw-loader": "^0.5.1",
     "sl-vue-tree": "^1.8.4",
+    "splitpanes": "^2.2.1",
     "vue": "^2.6.11",
     "vue-awesome": "^4.1.0",
     "vue-file-tree": "github:robogeek/vue-file-tree"

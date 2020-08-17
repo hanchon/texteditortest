@@ -51,7 +51,7 @@ export default {
       if (node.isLeaf) {
         console.log(node)
       // console.log(node.data.pathname);
-        this.$parent.openFile(node.data.fullPath);
+        this.$parent.$parent.openFile(node.data.fullPath);
         const response = await fetch(
           "http://127.0.0.1:8000/open_file/" + node.data.fullPath
         );

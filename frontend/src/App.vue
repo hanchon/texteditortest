@@ -1,17 +1,17 @@
 <template>
   <div id="app" @updateDict='updateDict' @click="closeContext">
-    <HelloWorld />
+    <CentralPanel />
   </div>
 </template>
 
 <script>
-import HelloWorld from './components/HelloWorld.vue'
+import CentralPanel from './components/CentralPanel.vue'
 //import CreateDictionary from './plugins/addtodict/createDictionary';
 
 export default {
   name: 'App',
   components: {
-    HelloWorld
+    CentralPanel
   },
   async created() {
     const response = await fetch("http://127.0.0.1:8000/open_project");
@@ -87,6 +87,9 @@ export default {
     },
     async previewFiles(qwe){
       console.log("butttt", qwe)
+    },
+    async openFile(file){
+      this.$emit("open_file", file)
     }
 
 

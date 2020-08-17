@@ -21,7 +21,6 @@ export default {
     return {
       files: [],
       tab: "",
-      active:false
     };
   },
   async created() {
@@ -40,6 +39,7 @@ export default {
       const data = await response.json();
       if (this.files.length > 0)
         this.openFile(this.files[0])
+      else this.$parent.noFileOpen();
       return data;
     },
     async openFile(item) {

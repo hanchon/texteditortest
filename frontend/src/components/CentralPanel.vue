@@ -9,7 +9,7 @@
 import Content from "./Content.vue";
 import Sidebar from "./Tree.vue";
 export default {
-  name: "HelloWorld",
+  name: "CentralPanel",
   // props: {
   //   msg: String
   // },
@@ -18,12 +18,8 @@ export default {
     Sidebar,
   },
   async created() {
-    this.$parent.$on("open_file", this.openFile)
   },
   methods: {
-    openFile(file) {
-      this.$emit("open_file", file);
-    },
   },
 };
 </script>

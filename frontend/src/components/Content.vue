@@ -1,29 +1,32 @@
 <template>
   <div class="main-content" v-bind:style="{ width: width + '%' }">
+    <button @click="openDictionaryEditor"> Edit Dictionary </button>
     <Files />
-    <Texto v-model="editorData" @input='update' />
-    <button @click="changewidth"/>
+    <Texto v-model="editorData" @input='update' v-show='text === 1'/>
+    <EditDict v-show='text === 2'/>
   </div>
 </template>
 
 <script>
+
 import Texto from "./Texto.vue";
 import Files from "./Files.vue";
+import EditDict from "./EditDictionary.vue";
 export default {
   name: "Content",
   components: {
     Texto,
     Files,
+    EditDict
   },
   data: function () {
-    return { data: {content:"", file:""}, editorData:'a', width: 85.5 };
+    return { data: {content:"", file:""}, editorData:'a', width: 85.5, text:1 };
   },
   created: async function () {
-    this.$parent.$on("open_file", this.openFile);
+    this.$parent.$parent.$on("open_file", this.openFile);
   },
   methods: {
     async openFile(file) {
-      
       if (file!=""){
         console.log('openingfile')
         this.$emit("opening_file", file);
@@ -46,15 +49,18 @@ export default {
       this.$emit("update_text", { text: data.raw, file: file });
       this.data.content = data.raw
       this.data.file = file
+      this.text = 1
       
     },
     update(text){
       this.data.content = text.content
       console.log('content     ', text)
     },
-    changewidth(){
-      this.width = 50;
-      console.log("qwe ")
+    openDictionaryEditor(){
+      this.text = 2
+    },
+    noFileOpen(){
+      this.text = 3
     }
   },
 };

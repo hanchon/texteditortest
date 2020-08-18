@@ -46,7 +46,7 @@ export default {
       console.log('open file files', item)
       const response = await fetch("http://127.0.0.1:8000/open_file/" + item);
       const data = await response.json();
-      this.$parent.openFile(item);
+      this.$parent.$parent.$parent.openFile(item);
       this.tab = item
       console.log("new tab", this.tab)
       console.log(data);

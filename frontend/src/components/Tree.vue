@@ -43,6 +43,7 @@ export default {
 
     this.$parent.$parent.$on("reload", this.reload);
     this.$parent.$parent.$on("closecontext", this.closeContext);
+    this.$parent.$parent.$on("open_file", this.selectOpenFile);
   },
   methods: {
     async nodeClick(node) {
@@ -120,7 +121,13 @@ export default {
     },
     async closeContext() {
       this.contextMenuIsVisible = false;
-    }
+    },
+    selectOpenFile(file){
+      this.$refs.slVueTree.traverse((node) => {
+        if(node.data.fullPath === './'+file)
+          this.$refs.slVueTree.select(node.path)
+      })
+    },
   }
 }
 </script>

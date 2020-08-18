@@ -89,6 +89,7 @@ export default {
       console.log("butttt", qwe)
     },
     async openFile(file){
+      console.log("App open file", file)
       this.$emit("open_file", file)
     }
 

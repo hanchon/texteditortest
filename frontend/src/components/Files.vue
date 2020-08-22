@@ -25,13 +25,22 @@ export default {
   },
   async created() {
     this.$parent.$on("opening_file", this.openingFile);
-    /*const response = await fetch("http://127.0.0.1:8000/opened_files");
-    const data = await response.json();
-    this.files = data.files;
-    console.log ('opned files ', this.files)
-    this.fetching = false;*/
+    this.$parent.$parent.$parent.$on("deleting_file", this.deletedFile);
   },
   methods: {
+    deletedFile(file){
+      let short = file.replace('./','')
+      console.log("deleted ", file)
+      let index = this.files.indexOf(short)
+      if (index > -1) {
+        this.files.splice(index, 1);
+        if (this.tab === short) {
+          if (this.files.length > 0){
+            this.openFile(this.files[0], false)
+          }
+        }
+      }
+    },
     async closeFile(file) {
       let index = this.files.indexOf(file)
       this.files.splice(index, 1);
@@ -43,26 +52,17 @@ export default {
       return data;
     },
     async openFile(item) {
-      console.log('open file files', item)
-      const response = await fetch("http://127.0.0.1:8000/open_file/" + item);
-      const data = await response.json();
-      this.$parent.$parent.$parent.openFile(item);
+      this.$parent.openFile(item)
+      this.$parent.$parent.$parent.openFileFromFiles(item);
       this.tab = item
-      console.log("new tab", this.tab)
-      console.log(data);
     },
     async openFileDic(item) {
       const name = item.detail.name
-      console.log(name)
-      
-      const response = await fetch("http://127.0.0.1:8000/open_file/" + name );
-      const data = await response.json();
-      this.$parent.openFile(name);
-      console.log(data);
+      this.$parent.openFile(name)
+      console.log("name", name)
+      this.$parent.$parent.$parent.openFileFromFiles(name);
     },
     openingFile(file) {
-      console.log("openining", file)
-      console.log(this.files)
       let short = file.replace('./','')
       if (!this.files.includes(short)){
         this.files.push(short)

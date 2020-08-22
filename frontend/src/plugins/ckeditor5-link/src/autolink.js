@@ -192,7 +192,6 @@ export default class AutoLink extends Plugin {
 	_checkAndApplyAutoLinkOnRange( rangeToCheck ) {
 		const model = this.editor.model;
 		const { text, range } = getLastTextLine( rangeToCheck, model );
-		console.log("zxczxc", url )
 		const url = getUrlAtTextEnd( text );
 
 		if ( url ) {
@@ -234,37 +233,27 @@ function isSingleSpaceAtTheEnd( text ) {
 }
 
 function getUrlAtTextEnd( text ) {
-	console.log("getUrlAtTextEnd", text)
-	
 	var URL_REG_EXP;
 	for (let i=0; i < localStorage.length; i++){
-        let key = localStorage.key(i)
+		let key = localStorage.key(i)
+		console.log("Trying to find ", key)
 		URL_REG_EXP = new RegExp(key, 'g')
-		/*let match = URL_REG_EXP.exec( text );
-		if (match){
-			console.log("match ", text.length, " ", key.length, " ", match.index)
-			if (text.length - key.length  == match.index){
-				return {"key":key, "url":localStorage[key]}	
-			}	 
-		}*/
 		let arraymatch
-		while ((arraymatch = URL_REG_EXP.exec( text )) !== null) {
-			console.log(`Found ${arraymatch[0]}. Next starts at ${URL_REG_EXP.lastIndex}.`);
-			if (text.length  == URL_REG_EXP.lastIndex){
-				return {"key":key, "url":localStorage[key]}	
+		let tries = 0;
+		if (text != '.')
+			while ((arraymatch = URL_REG_EXP.exec( text )) !== null) {
+				console.log(`Found ${arraymatch[0]}. Next starts at ${URL_REG_EXP.lastIndex}.`);
+				if (text.length  == URL_REG_EXP.lastIndex){
+					return {"key":key, "url":localStorage[key]}	
+				}
+				if (tries==3){
+					console.log("3 tries")
+					break;
+				}
+				tries++;
 			}
-			// expected output: "Found foo. Next starts at 9."
-			// expected output: "Found foo. Next starts at 19."
-		}
 	}
 	return null 
-	/*const match = URL_REG_EXP.exec( text );
-	console.log("getUrlAtTextEnd", match)
-	return match ? match[ URL_GROUP_IN_MATCH ] : null;*/
-	
-	/*if (localStorage[text] != undefined)
-		return localStorage[text]
-	return null;*/
 }
 
 function isEmail( linkHref ) {
@@ -274,9 +263,3 @@ function isEmail( linkHref ) {
 function isLinkAllowedOnRange( range, model ) {
 	return model.schema.checkAttributeInSelection( model.createSelection( range ), 'linkHref' );
 }
-/*
-function dictExists( url ) {
-	if (localStorage[url] != undefined)
-		return true
-	return false
-}*/

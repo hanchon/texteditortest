@@ -43,22 +43,14 @@ export default {
 
     this.$parent.$parent.$on("reload", this.reload);
     this.$parent.$parent.$on("closecontext", this.closeContext);
-    this.$parent.$parent.$on("open_file", this.selectOpenFile);
+    this.$parent.$parent.$on("open_file_tree", this.selectOpenFile);
   },
   methods: {
     async nodeClick(node) {
       this.contextMenuIsVisible = false;
       this.node = node
       if (node.isLeaf) {
-        console.log(node)
-      // console.log(node.data.pathname);
-        this.$parent.$parent.openFile(node.data.fullPath);
-        const response = await fetch(
-          "http://127.0.0.1:8000/open_file/" + node.data.fullPath
-        );
-        await response.json();
-        console.log("path", node.data.fullPath)
-        
+        this.$parent.$parent.openFileFromTree(node.data.fullPath);
       }
     },
     async nodecontextmenu(node) {

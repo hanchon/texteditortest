@@ -1,6 +1,10 @@
 <template>
 <div>
-    <b-table striped hover :items="items">
+    <b-table striped hover :fields="fields" :items="items">
+     <template v-slot:cell(index)="data">
+        <button @click="deleteKey(data.index)">Delete</button>
+      </template>
+
     </b-table>
 
 </div>
@@ -10,6 +14,14 @@
 export default {
   data() {
     return {
+      fields: [
+          // A column that needs custom formatting
+          'key',
+          // A regular column
+          'value',
+          'index',
+          ],         
+      
       items: []
     };
   },
@@ -23,6 +35,14 @@ export default {
 
   },
   methods: {
+    deleteKey(index) {
+      let k = this.items[index].key;
+      console.log("delete ", this.items[index].key);
+      this.items.splice(index, 1);
+      delete localStorage[k]
+      this.$parent.$parent.$parent.saveDict()
+      
+    }
   }
 };
 </script>

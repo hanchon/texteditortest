@@ -26,7 +26,7 @@ export default {
     }
   },
   methods: {
-    async updateDict(file){
+    async saveDict(){
       var dict = {}
       for (let i=0; i < localStorage.length; i++){
         let k = localStorage.key(i)
@@ -42,9 +42,10 @@ export default {
         body:JSON.stringify(filepost)
       }
       const response1 = await fetch("http://127.0.0.1:8000/save_filepost/", settings);
-      const data1 = await response1.json();
-      console.log(data1, file.detail.name)
-
+      await response1.json();
+    },
+    async updateDict(file){
+      this.saveDict()
       await this.createFile(file.detail);
     },
     async createFile(file) {
@@ -75,7 +76,9 @@ export default {
     async removeFile(file){
       const response = await fetch("http://127.0.0.1:8000/remove_file/"+file);
       await response.json();
+      this.$emit("deleting_file", file);
       this.$emit("reload");
+
     },
     async removeDir(dir){
       const response = await fetch("http://127.0.0.1:8000/remove_directory/"+dir);
@@ -88,12 +91,14 @@ export default {
     async previewFiles(qwe){
       console.log("butttt", qwe)
     },
-    async openFile(file){
+    async openFileFromFiles(file, shouldSave=true){
       console.log("App open file", file)
-      this.$emit("open_file", file)
+      this.$emit("open_file_tree", file, shouldSave)
+    },
+    async openFileFromTree(file, shouldSave=true){
+      console.log("App open file", file)
+      this.$emit("open_file_files", file, shouldSave)
     }
-
-
   }
 }
 </script>

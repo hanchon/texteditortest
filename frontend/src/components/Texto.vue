@@ -76,8 +76,6 @@
             this.$emit("input", { content: this.editorData, file: this.file });
           },
           update_text: function (obj) {
-            
-            console.log('update text', this.editorData)
             this.editorData = obj.text;
             this.file = obj.file;
             this.$emit("update", { content: this.editorData, file: this.file });

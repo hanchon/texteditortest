@@ -58,10 +58,12 @@ async def save_file(filepost: FilePost):
     print (filepost.name)
     print (filepost.content)
     try:
-        file = open(filepost.name, 'w')
-        file.write(filepost.content)
-        file.close()
-        return {'raw': True}
+        if filepost.name:
+            file = open(filepost.name, 'w')
+            file.write(filepost.content)
+            file.close()
+            return {'raw': True}
+        return {'raw': False}
     except Exception as e:
         print (e)
         return {'raw': False}
@@ -116,12 +118,6 @@ def get_file(file_path: str):
         data = file.read()
         file.close()
         return {'raw': data}
-    except FileNotFoundError:
-        file = open(file_path, 'w+')
-        data = file.read()
-        open_files.add(file_path)
-        file.close()
-        return {'raw': data}
     except Exception as e:
         print (e)
         return {'raw': data}
@@ -152,17 +148,6 @@ def create_directory(file_path: str):
         print(error)
         return {'result': False}
 
-
-#TODO: allow links in the data str
-@app.get('/save_file/{filename}/{data}')
-def save_file(filename: str, data:str):
-    try:
-        file = open(filename)
-        file.write(data)
-        file.close()
-        return {'raw': True}
-    except Exception:
-        return {'raw': False}
 
 @app.get("/close_file/{file_path:path}")
 def close_file(file_path: str):

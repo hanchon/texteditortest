@@ -1,7 +1,7 @@
 import Plugin from '@ckeditor/ckeditor5-core/src/plugin';
 import imageIcon from '@ckeditor/ckeditor5-core/theme/icons/image.svg';
 import ButtonView from '@ckeditor/ckeditor5-ui/src/button/buttonview';
-import AddToDictCommand from './addtodictcommand' 
+//import AddToDictCommand from './addtodictcommand' 
 
 
 export default class CreateDictionary extends Plugin {
@@ -25,7 +25,7 @@ export default class CreateDictionary extends Plugin {
                 const content = editor.data.toView( editor.model.getSelectedContent( modelDocument.selection ) );
                 //this.editor.model.insertContent(selection)
         //		let scopeElement = model.schema.getLimitElement( selection );
-                console.log(content)  
+                console.log(content) 
                 let read = ''
                 let current = content['_children']
                 let depth = 0
@@ -41,25 +41,58 @@ export default class CreateDictionary extends Plugin {
                         break;}
                     
                 }
-                console.log(read)
-                if (read) {
+                if (!read)
+                    read = this.getLastWord(this.editor)
+                if(!this.isEmptyOrSpaces(read)) {
                     localStorage[read] = read + '.html'
-                    
-                    //editor.execute( 'input', { text: ' ' } );
-                    //editor.editing.view.focus();
                     document.getElementById("app").dispatchEvent(new CustomEvent("updateDict", {
                         detail: { 'name': read + '.html', 'complete': true }}));
-
                 }
                              
             } );
 
             return view;
         } );
-
-        editor.commands.add( 'createDict', new AddToDictCommand( editor ) );
-
-		// Set the Ctrl+U keystroke.
-		editor.keystrokes.set( 'CTRL+U', 'createDict' );
     }
+    
+    isEmptyOrSpaces(str){
+        return str === null || str.match(/^ *$/) !== null;
+    }
+
+    getLastWord( editor ) {
+		console.log("asd")
+		const model = editor.model;
+		const document = model.document;
+		const selection = document.selection;
+		//const selectionParent = editor.model.document.selection.focus.parent;
+		//const probe = model.createSelection( model.document.selection );
+
+		const rangeBeforeSelection = model.createRange( model.createPositionAt( selection.focus.parent, 0 ), selection.focus );
+
+		// Do nothing if selection is not collapsed.
+		if ( !selection.isCollapsed ) {
+			return;
+		}
+
+		const nodesMerged = this.mergeNodes( rangeBeforeSelection.getItems() );
+
+		if ( !( nodesMerged && nodesMerged.length ) ) {
+			return;
+		}
+
+		const dataArr = nodesMerged.split( ' ' );
+		const url = dataArr[ dataArr.length - 1 ];
+		return url
+	}
+
+	mergeNodes( nodeList ) {
+		const _nodeList = Array.isArray( nodeList ) ? nodeList : Array.from( nodeList );
+		return _nodeList.reduce( ( rangeText, node ) => {
+			if ( node.is( 'softBreak' ) ) {
+				return '';
+			}
+	
+			return rangeText + node.data;
+		}, '' );
+	}
 }

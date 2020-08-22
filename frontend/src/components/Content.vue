@@ -1,6 +1,5 @@
 <template>
   <div class="main-content" v-bind:style="{ width: width + '%' }">
-    <button @click="openDictionaryEditor"> Edit Dictionary </button>
     <Files />
     <Texto v-model="editorData" @input='update' v-show='text === 1'/>
     <EditDict v-show='text === 2'/>
@@ -24,6 +23,7 @@ export default {
   },
   created: async function () {
     this.$parent.$parent.$on("open_file_files", this.openFile);
+    this.$parent.$parent.$on("open_edit_dictionary", this.openDictionaryEditor);
   },
   methods: {
     async openFile(file, save) {

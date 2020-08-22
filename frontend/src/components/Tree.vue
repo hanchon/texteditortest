@@ -1,6 +1,6 @@
 <template>
   <div id="treefile" class="sidebar-test" @contextmenu.prevent="" @click="contextMenuIsVisible = false">
-
+    <button @click="openDictionaryEditor"> Edit Dictionary </button>
     <sl-vue-tree ref="slVueTree" v-model="nodes" @nodeclick="nodeClick" @nodecontextmenu="nodecontextmenu" @drop="drop" >
 
       <template slot="toggle" slot-scope="{ node }">
@@ -120,6 +120,9 @@ export default {
           this.$refs.slVueTree.select(node.path)
       })
     },
+    openDictionaryEditor(){
+      this.$parent.$parent.openDictionaryEditor()      
+    }
   }
 }
 </script>

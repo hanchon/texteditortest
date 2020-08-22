@@ -98,6 +98,9 @@ export default {
     async openFileFromTree(file, shouldSave=true){
       console.log("App open file", file)
       this.$emit("open_file_files", file, shouldSave)
+    },
+    openDictionaryEditor(){
+      this.$emit("open_edit_dictionary")
     }
   }
 }

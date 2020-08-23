@@ -6,15 +6,15 @@
       </template>
 
       <template v-slot:cell(key)="data">
-        <form>
-          <input type="text" v-model="data.item.key" v-on:keyup.enter="submitKey(data.item.original, data.item.key, data.index)">
+        <form @submit.prevent>
+          <input type="text" v-model="data.item.key" v-on:keydown.enter="submitKey(data.item.original, data.item.key, data.index)">
         </form>
       </template>
 
 
       <template v-slot:cell(value)="data">
-        <form>
-          <input type="text" v-model="data.item.value" v-on:keyup.enter="submitPath(data.item.key, data.item.value)">
+        <form @submit.prevent>
+          <input type="text" v-model="data.item.value" v-on:keydown.enter="submitPath(data.item.key, data.item.value)">
         </form>
       </template>
 
@@ -24,6 +24,10 @@
 </template>
 
 <script>
+// 
+// 
+// 
+
 export default {
   data() {
     return {
@@ -39,6 +43,9 @@ export default {
     };
   },
   async created() {
+    this.reload()
+  },
+  async mounted() {
     this.reload()
   },
   methods: {

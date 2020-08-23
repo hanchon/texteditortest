@@ -12,7 +12,7 @@
       </template>
 
 
-      <template v-slot:cell(value)="data">
+      <template v-slot:cell(path)="data">
         <form @submit.prevent>
           <input type="text" v-model="data.item.value" v-on:keydown.enter="submitPath(data.item.key, data.item.value)">
         </form>
@@ -35,7 +35,7 @@ export default {
           // A column that needs custom formatting
           'key',
           // A regular column
-          'value',
+          'path',
           'index',
           ],         
       
@@ -43,10 +43,10 @@ export default {
     };
   },
   async created() {
+    this.$parent.$on("reloaddict", this.reload)
     this.reload()
   },
   async mounted() {
-    this.reload()
   },
   methods: {
     deleteKey(index) {

@@ -60,6 +60,7 @@ export default {
       this.data.content = text.content
     },
     openDictionaryEditor(){
+      this.$emit("reloaddict")
       this.text = 2
     },
     noFileOpen(){

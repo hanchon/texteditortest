@@ -26,6 +26,11 @@ export default {
   async created() {
     this.$parent.$on("opening_file", this.openingFile);
     this.$parent.$parent.$parent.$on("deleting_file", this.deletedFile);
+    const response = await fetch("http://127.0.0.1:8000/opened_files");
+    const data = await response.json();
+    this.files = data.files;
+    if (this.files.length > 0)
+        this.openFile(this.files[0])
   },
   methods: {
     deletedFile(file){

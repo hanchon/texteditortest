@@ -92,11 +92,13 @@ export default {
       console.log("butttt", qwe)
     },
     async openFileFromFiles(file, shouldSave=true){
-      console.log("App open file", file)
+      const response = await fetch("http://127.0.0.1:8000/open_file/"+file);
+      await response.json();
       this.$emit("open_file_tree", file, shouldSave)
     },
     async openFileFromTree(file, shouldSave=true){
-      console.log("App open file", file)
+      const response = await fetch("http://127.0.0.1:8000/open_file/"+file);
+      await response.json();
       this.$emit("open_file_files", file, shouldSave)
     },
     openDictionaryEditor(){

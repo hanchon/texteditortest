@@ -28,6 +28,9 @@
 
     export default {
         name: 'ck',
+        props: {
+            id:Number
+        },
         data() {
             return {
                 editor: ClassicEditor,
@@ -76,9 +79,11 @@
             this.$emit("input", { content: this.editorData, file: this.file });
           },
           update_text: function (obj) {
-            this.editorData = obj.text;
-            this.file = obj.file;
-            this.$emit("update", { content: this.editorData, file: this.file });
+            if (obj.panel == this.id) {
+                this.editorData = obj.text;
+                this.file = obj.file;
+                this.$emit("update", { content: this.editorData, file: this.file });
+            }
           },
           onReady( editor )  {
                 // Insert the toolbar before the editable area.

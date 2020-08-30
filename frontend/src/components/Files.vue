@@ -17,6 +17,9 @@
 //v-bind:style='{"background-color" : (file === tab? "orange" : "red" )}'
 //var filename = fullPath.replace(/^.*[\\\/]/, '')
 export default {
+  props: {
+    id:Number
+  },
   data() {
     return {
       files: [],
@@ -53,21 +56,26 @@ export default {
       const data = await response.json();
       if (this.files.length > 0)
         this.openFile(this.files[0])
-      else this.$parent.noFileOpen();
+      else this.$parent.noFileOpen(this.id);
       return data;
     },
     async openFile(item) {
-      this.$parent.openFile(item)
+      this.$parent.openFile({"panel":this.id, "item":item})
       this.$parent.$parent.$parent.openFileFromFiles(item);
       this.tab = item
     },
     async openFileDic(item) {
       const name = item.detail.name
       this.$parent.openFile(name)
+       this.$parent.openFile({"panel":this.id, "item":name})
       console.log("name", name)
       this.$parent.$parent.$parent.openFileFromFiles(name);
     },
-    openingFile(file) {
+    openingFile(obj) {
+      console.log("Active is ", obj.panel)
+      if (obj.panel != this.id)
+        return;
+      let file = obj.file
       let short = file.replace('./','')
       if (!this.files.includes(short)){
         this.files.push(short)

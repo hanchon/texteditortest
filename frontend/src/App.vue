@@ -146,7 +146,7 @@ export default {
     async openFileFromTree(file, shouldSave=true){
       const response = await fetch("http://127.0.0.1:8000/open_file/"+file);
       await response.json();
-      this.$emit("open_file_files", file, shouldSave)
+      this.$emit("open_file_files", {"item":file}, shouldSave)
     },
     openDictionaryEditor(){
       this.$emit("open_edit_dictionary")

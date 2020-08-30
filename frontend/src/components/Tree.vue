@@ -32,6 +32,9 @@
 
 export default {
   name: 'app',
+  props: {
+    id:Number
+  },
   data () {
     return {
      nodes: [],
@@ -47,6 +50,7 @@ export default {
   },
   methods: {
     async nodeClick(node) {
+      console.log(node.data.fullPath);
       this.contextMenuIsVisible = false;
       this.node = node
       if (node.isLeaf) {
@@ -116,7 +120,7 @@ export default {
     },
     selectOpenFile(file){
       this.$refs.slVueTree.traverse((node) => {
-        if(node.data.fullPath === './'+file)
+        if(node.data.fullPath === file)
           this.$refs.slVueTree.select(node.path)
       })
     },

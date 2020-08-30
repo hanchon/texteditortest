@@ -1,6 +1,20 @@
 <template>
-  <div id="app" @updateDict='updateDict' @click="closeContext">
-    <CentralPanel />
+  <div>
+    <div>
+      <b-navbar type="dark">
+        <b-dropdown id="dropdown" text="File" >
+          <b-dropdown-item class="context" href="#" @click="createProject">Create New Project</b-dropdown-item>
+        </b-dropdown>
+        <b-dropdown id="dropdown"  text="Projects" >
+            <li v-for="item in items" :key="item.message">
+               <b-dropdown-item class="context" href="#" @click="openProject(item)">{{ item }}</b-dropdown-item>
+            </li>
+        </b-dropdown>
+      </b-navbar>
+    </div>
+    <div id="app" @updateDict='updateDict' @click="closeContext">
+      <CentralPanel />
+    </div>
   </div>
 </template>
 
@@ -13,19 +27,52 @@ export default {
   components: {
     CentralPanel
   },
-  async created() {
-    const response = await fetch("http://127.0.0.1:8000/open_project");
-    const data = await response.json();
-    var dict = {}
-    if (data.raw)
-      dict =  JSON.parse(data.raw);
-    
-    for (var key in dict) {
-      localStorage[key] = dict[key]
-      console.log(key, dict[key])
+  data () {
+    return {
+     items: []
     }
   },
+  async created() {
+    const response = await fetch("http://127.0.0.1:8000/init/");
+    const data = await response.json();
+    console.log(data.raw)
+
+    const response1 = await fetch("http://127.0.0.1:8000/list_projects/");
+    const data1 = await response1.json();
+    console.log(data1.projects)
+    this.items = data1.projects
+  },
+  async mounted() {
+    this.openProject()
+  },
   methods: {
+    async createProject(){
+      let dir = prompt("Project Name","");
+      if (dir == null || dir == "") {
+        return;
+      }
+      console.log("App ", dir)
+      const response = await fetch("http://127.0.0.1:8000/create_new_project/"+dir);
+      const res = await response.json();
+      if (res.result) {
+        this.openProject(dir)
+      }
+      this.items.push(dir)
+    },
+    async openProject(projectName='project'){
+      console.log("Opening", projectName)
+      const response = await fetch("http://127.0.0.1:8000/open_project/"+projectName);
+      const data = await response.json();
+      var dict = {}
+      if (data.raw)
+        dict =  JSON.parse(data.raw);
+      
+      for (var key in dict) {
+        localStorage[key] = dict[key]
+        console.log(key, dict[key])
+      }
+      this.$emit("reload");
+    },
     async saveDict(){
       var dict = {}
       for (let i=0; i < localStorage.length; i++){
@@ -115,6 +162,11 @@ export default {
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
   color: #2c3e50;
-  margin-top: 60px;
+  margin-top: 0px;
 }
+
+.context {
+  z-index: 10000;
+}
+
 </style>

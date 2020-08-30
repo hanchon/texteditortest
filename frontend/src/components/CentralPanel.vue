@@ -42,7 +42,7 @@ a {
 }
 
 .side {
-  z-index: 1000;
+  z-index: 10;
 }
 .cont {
   z-index: 1;

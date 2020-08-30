@@ -24,24 +24,82 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-
-
 class FilePost(BaseModel):
     name: str
     content: str
 
-@app.get("/open_project")
-async def open_project():
+async def get_current_project():
     try:
-        os.chdir("./project/")
-    except Exception:
-        # Note: we are already in the tests folder
-        pass
-    try:
-        file = open('.dict', 'r')
+        file = open(".frost", 'r')
+        data = file.read()
+        file.close()
+        return data
     except Exception as e:
         print (e)
-        file = open('.dict', 'w')
+        file = open(".frost", 'w')
+        return None
+        
+
+
+@app.get("/init/")
+async def init():
+    os.chdir("./projects")
+    project = await get_current_project()
+    return {'raw': project}
+    
+@app.get("/list_projects/")
+async def list_projects():
+    listOfFile = os.listdir("./")
+    allFiles = list()
+    # Iterate over all the entries
+    for entry in listOfFile:
+        if os.path.isdir(entry):
+            #allFiles = allFiles + getListOfFiles(fullPath)
+            allFiles.append(entry)
+    return {'projects' : allFiles}
+
+
+
+async def save_current_project(project):
+    try:
+        file = open(".frost", 'w')
+        file.write(project)
+        file.close()
+    except Exception as e:
+        print(e)
+        file.close()
+
+@app.get("/create_new_project/{new_project_name}")
+async def create_new_project(new_project_name):
+    try:
+        if not os.path.exists(new_project_name):
+            os.mkdir(new_project_name)
+            file = open(new_project_name+'/.dict', 'w')
+            file.close()
+            return {'result': True}
+        return {'result': False}
+    except Exception as e:
+        return {'result': False}
+
+
+@app.get("/open_project/{project}")
+async def open_project(project):
+    if os.path.exists(project):
+        print("path exists ", project)
+        current_project = project
+        await save_current_project(project)
+        return open_dictionary(project)
+    else:
+        print("path doesnt exist", project)
+        return {'result':False}
+
+def open_dictionary(project):
+    filename = project+'/.dict'
+    try:
+        file = open(filename, 'r')
+    except Exception as e:
+        print (e)
+        file = open(filename, 'w')
     try:
         data = file.read()
         print (data)
@@ -49,7 +107,7 @@ async def open_project():
         return {'raw': data}
     except Exception as e:
         print (e)
-        return {'raw': data}
+        return {'raw': None}
 
 
 @app.post("/save_filepost/")
@@ -67,10 +125,6 @@ async def save_file(filepost: FilePost):
     except Exception as e:
         print (e)
         return {'raw': False}
-
-@app.get("/")
-def read_root():
-    return {"Hello": "World"}
 
 def getListOfFiles(dirName):
     # create a list of file and sub directories 
@@ -93,14 +147,10 @@ def getListOfFiles(dirName):
     return allFiles
 
 @app.get("/dir")
-def dir():
-    try:
-        os.chdir("./project/")
-    except Exception:
-        # Note: we are already in the tests folder
-        pass
-    #arr = [os.path.join(dp, f) for dp, dn, fn in os.walk(os.path.expanduser("~/files")) for f in fn]
-    arr =  getListOfFiles(".")
+async def dir():
+    current_project = await get_current_project()
+    print ("Files from ", current_project)
+    arr =  getListOfFiles(current_project)
     res = {'data': arr}
     return res
 

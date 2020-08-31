@@ -1,7 +1,9 @@
 <template>
   <div id="filehandler" v-on:change="openFileDic">
     <b-nav tabs >
-      <b-nav-item class='filetab' v-for="file in this.files" v-bind:key="file" @click="openFile(file)"   v-bind:class="{'active':(tab === file)}">
+      <b-nav-item class='filetab' v-for="file in this.files" v-bind:key="file" @click="openFile(file)"   v-bind:class="{'active':(tab === file)}"
+      :draggable="true"  v-on:dragstart="drag($event, file)"  
+      v-on:drop="drop($event, file)" v-on:dragover="allowDrop">
                 <a> {{file.replace(/^.*[\\\/]/, '')}} </a>
         <button class='filetab' @click="closeFile(file)" v-on:click.stop>x</button>
       </b-nav-item>
@@ -11,31 +13,40 @@
 </template>
 
 
-<script>
+<script>   
 
 //  :active='file === tab'
 //v-bind:style='{"background-color" : (file === tab? "orange" : "red" )}'
 //var filename = fullPath.replace(/^.*[\\\/]/, '')
 export default {
   props: {
-    id:Number
+    id:Number,
+    files: Array
   },
   data() {
     return {
-      files: [],
       tab: "",
     };
   },
   async created() {
     this.$parent.$on("opening_file", this.openingFile);
     this.$parent.$parent.$parent.$on("deleting_file", this.deletedFile);
-    const response = await fetch("http://127.0.0.1:8000/opened_files");
-    const data = await response.json();
-    this.files = data.files;
     if (this.files.length > 0)
         this.openFile(this.files[0])
   },
   methods: {
+    allowDrop:function(event) {
+      event.preventDefault();
+    },
+
+    drop(event, id){
+      var data = event.dataTransfer.getData("Text");
+      console.log(data, id)
+    },
+    drag(event, file){
+      event.dataTransfer.setData("Text", file);
+      console.log(event)
+    },
     deletedFile(file){
       let short = file.replace('./','')
       console.log("deleted ", file)
@@ -73,15 +84,22 @@ export default {
     },
     openingFile(obj) {
       console.log("Active is ", obj.panel)
-      if (obj.panel != this.id)
-        return;
       let file = obj.file
       let short = file.replace('./','')
-      if (!this.files.includes(short)){
-        this.files.push(short)
-        this.active = true
+      if (obj.panel != this.id) {
+        if (this.files.includes(short)){
+          let index = this.files.indexOf(short)
+          this.files.splice(index, 1);
+          if (this.files.length == 0)
+            this.$parent.noFileOpen(this.id);
+        }
+      } else {      
+        if (!this.files.includes(short)){
+          this.files.push(short)
+          this.active = true
+        }
+        this.tab = short
       }
-      this.tab = short
     },
     createFile(){
       this.$parent.$parent.$parent.createFile({'name':"", 'complete':false})

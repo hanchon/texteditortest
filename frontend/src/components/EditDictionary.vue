@@ -1,5 +1,5 @@
 <template>
-<div>
+<div @click="imActive">
     <b-table striped hover :fields="fields" :items="items">
      <template v-slot:cell(index)="data">
         <button @click="deleteKey(data.index)">Delete</button>
@@ -74,8 +74,11 @@ export default {
       for (let i=0; i < localStorage.length; i++){
           let k = localStorage.key(i)
           this.items.push( {'key' : k , 'original':k, 'value' : localStorage[k]})
-    }
-    }
+      }
+    },
+    imActive (){
+      this.$emit("active", this.id)
+    },
   }
 };
 </script>

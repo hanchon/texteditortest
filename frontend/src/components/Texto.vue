@@ -1,5 +1,5 @@
 <template>
-    <div id="ck" class="ck-editor">
+    <div id="ck" class="ck-editor" @click="imActive">
         <ckeditor :editor="editor" v-model="editorData" :config="editorConfig" @ready="onReady" @input="onEditorInput" ></ckeditor>
     </div>
 </template>
@@ -74,6 +74,9 @@
           this.$on("change", this.onReady);          
         },
         methods: {
+          imActive (){
+              this.$emit("active", this.id)
+          },
           onEditorInput: function () {
             // pass updated content back to the parent
             this.$emit("input", { content: this.editorData, file: this.file });

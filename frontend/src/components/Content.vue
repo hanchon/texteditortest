@@ -1,10 +1,10 @@
 <template>
   <div class="main-content" >
     <button @click="push">Push</button>
-    <div v-for="item in data" :key="item.id">
-      <Files :id=item.id />
-      <Texto :id=item.id @input='update' v-show='item.text === 1'/>
-      <EditDict v-show='item.text === 2'/>
+    <div v-for="item in data" :key="item.id" v-on:drop="drop($event, item.id)" v-on:dragover="allowDrop">
+      <Files :files=item.files :id=item.id />
+      <Texto :id=item.id @input='update' v-show='item.text === 1' @active="setActive"/>
+      <EditDict v-show='item.text === 2' @active="setActive"/>
     </div>
   </div>
 </template>
@@ -22,21 +22,62 @@ export default {
     EditDict
   },
   data: function () {
-    return { data: [{id:1, content:"", file:"", text:1}], active: 1  };
+    return { data: [], active: 1  };
   },
   created: async function () {
     this.$parent.$parent.$on("open_file_files", this.openFile);
     this.$parent.$parent.$on("open_edit_dictionary", this.openDictionaryEditor);
-    this.active = 1
+    this.active = 0
+    this.data.push({id:0, content:"", file:"", text:1, files: []})
+    const response = await fetch("http://127.0.0.1:8000/opened_files");
+    const data = await response.json();
+    let files = data.files;
+    this.data[0].files = files
   },
   methods: {
+    allowDrop:function(event) {
+      event.preventDefault();
+    },
+
+    drop(event, id){
+       var data = event.dataTransfer.getData("Text");
+      console.log(data, id)
+    },
+
     async push(){
-      this.data.push({id:this.data.length+1, content:"", file:"", text:1})
-      this.active = this.data.length
+      if (this.data.length == 1 && this.data[0].text != 1 )
+        return;
+      if (this.data[this.active].files.length == 1)
+        return;
+      let newid = this.data[this.data.length-1].id + 1
+      this.data.push({id:newid, content:"", file:"", text:1, files: [this.data.file]})
+      this.active = newid
+    },
+    checkFileisOpen(file){
+      var index = -1;
+      this.data.forEach(element => {
+        element.files.forEach(f => {
+          if (f == file){
+            index = element.id
+          }
+        })
+      });
+      return index;
     },
     async openFile(obj, save) {
-      if (obj.panel)
-        this.active = obj.panel
+      console.log("Complete data opeening file ", obj.item)
+      console.log(this.data)
+      console.log("openfile ", obj)
+      console.log("File is open on ", this.checkFileisOpen(obj.item))
+      if (obj.panel === 0 || obj.panel) {
+        this.setActive(obj.panel)
+        console.log("Opening file on ", obj.panel)
+      } else {
+        var isOpenOn = this.checkFileisOpen(obj.item)
+        if (isOpenOn != -1)
+          this.setActive(isOpenOn)
+      }
+
       let file = obj.item
       if (file!=""){
         if (save){
@@ -45,11 +86,11 @@ export default {
         const response = await fetch("http://127.0.0.1:8000/get_file/" + file);
         const data = await response.json();
         
-        this.$emit("update_text", { panel: this.active, text: data.raw, file: file });
-        this.$emit("opening_file", { panel: this.active, file: file })
+        this.$emit("update_text", { panel: this.data[this.active].id, text: data.raw, file: file });
+        this.$emit("opening_file", { panel: this.data[this.active].id, file: file })
         this.data.content = data.raw
         this.data.file = file
-        this.data[this.active-1].text = 1
+        this.data[this.active].text = 1
       }
     },
     async saveCurrentFile(){
@@ -68,20 +109,38 @@ export default {
       this.data.content=''
     },
     update(text){
-      this.data[this.active-1].content = text.content
+      this.data[this.active].content = text.content
     },
     openDictionaryEditor(){
       this.$emit("reloaddict")
-      this.data[this.active-1].text = 2
+      this.data[this.active].text = 2
     },
     noFileOpen(panel){
-      console.log(panel)
+      var index;
+      this.data.forEach(element => {
+        if (element.id == panel) {
+        index = this.data.indexOf(element);
+        }
+      });
+      console.log("No files open in id=", panel, " INDEX ",index)
       if (this.data.length == 1)
-        this.data[panel-1].text = 3
+        this.data[index].text = 3
       else {
-        this.active = this.data.length
-        this.data.splice(panel-1, 1);
+        this.data.splice(index, 1);
+        this.active = this.data.length-1
+        console.log("Deleted panel ", panel, " with index ", index)
+        console.log("New active is", this.active)
       }
+    },
+    setActive(panel){
+      var index;
+      this.data.forEach(element => {
+          if (element.id == panel) {
+            index = this.data.indexOf(element);
+          }
+      });
+      this.active = index;
+      console.log("New active is ", panel, " on index ", this.active)
     }
   },
 };

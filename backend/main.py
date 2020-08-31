@@ -43,7 +43,10 @@ async def get_current_project():
 
 @app.get("/init/")
 async def init():
-    os.chdir("./projects")
+    try:
+        os.chdir("./projects")
+    except Exception as e:
+        print (e)
     project = await get_current_project()
     return {'raw': project}
     

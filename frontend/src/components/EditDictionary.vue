@@ -37,13 +37,17 @@ export default {
           // A regular column
           'path',
           'index',
-          ],         
+          ],        
       
-      items: []
+      items: [],
+      parentContent: "",
+      mainApp: ""
     };
   },
   async created() {
-    this.$parent.$on("reloaddict", this.reload)
+    this.parentContent = this.$parent.$parent.$parent
+    this.mainApp = this.parentContent.$parent.$parent
+    this.parentContent.$on("reloaddict", this.reload)
     this.reload()
   },
   async mounted() {
@@ -54,7 +58,7 @@ export default {
       console.log("delete ", this.items[index].key);
       this.items.splice(index, 1);
       delete localStorage[k]
-      this.$parent.$parent.$parent.saveDict()
+      this.mainApp.saveDict()
     },
     submitKey(key, newkey, index){
       console.log("Submit key ", key, newkey, index)
@@ -66,7 +70,7 @@ export default {
     submitPath(key, newPath){
       console.log("Submit path ", key, newPath)
       localStorage[key] = newPath
-      this.$parent.$parent.$parent.saveDict()
+      this.mainApp.saveDict()
       this.reload()
     },
     reload(){

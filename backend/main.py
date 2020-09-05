@@ -65,7 +65,7 @@ async def list_projects():
 
 async def save_current_project(project):
     try:
-        file = open(".frost", 'w')
+        file = open("/.frost", 'w')
         file.write(project)
         file.close()
     except Exception as e:
@@ -176,19 +176,29 @@ def get_file(file_path: str):
         return {'raw': data}
 
 @app.get('/create_file/{file_path:path}')
-def create_file(file_path: str):
+async def create_file(file_path: str):
     data = ""
+    current_project = await get_current_project()
+    #file_path = "./projects/"+ file_path
     print ("create_file ", file_path)
     try:
-        if not os.path.isfile(file_path):
+        res = os.path.isfile(file_path)
+        print (res)
+    except Exception as e:
+        print ("qwe", e)
+    if not res:
+        try:            
             file = open(file_path, "w+")
             data = file.read()
             open_files.add(file_path)
             file.close()
             return {'raw': data}
-    except Exception as e:
-        print (e)
-        return {'raw': data}
+        except Exception as e:
+            print ("create file exception ", e)
+            return {'raw': data}
+    else:
+        print("whaa")
+    
 
 @app.get('/create_directory/{file_path:path}')
 def create_directory(file_path: str):

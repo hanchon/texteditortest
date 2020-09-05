@@ -1,7 +1,7 @@
 <template>
   <div id="treefile" class="sidebar-test" @contextmenu.prevent="" @click="contextMenuIsVisible = false">
     <button @click="openDictionaryEditor"> Edit Dictionary </button>
-    <sl-vue-tree ref="slVueTree" v-model="nodes" @nodeclick="nodeClick" @nodecontextmenu="nodecontextmenu" @drop="drop" >
+    <sl-vue-tree ref="slVueTree" v-model="nodes" @nodeclick="nodeClick" @nodecontextmenu="nodecontextmenu" @drop="drop">
 
       <template slot="toggle" slot-scope="{ node }">
           <span v-if="!node.isLeaf">
@@ -16,6 +16,7 @@
       <template slot="sidebar" slot-scope="{ node }">
           <icon name="circle" v-if="node.data.isModified"></icon>
       </template>
+      
     </sl-vue-tree>
   <div class="contextmenu" ref="contextmenu" v-show="contextMenuIsVisible">
       <div @click="createFile">Create File</div>
@@ -38,7 +39,8 @@ export default {
   data () {
     return {
      nodes: [],
-     contextMenuIsVisible: false
+     contextMenuIsVisible: false,
+     selectedNodesTitle:''
     }
   },
   async mounted() {
@@ -65,8 +67,12 @@ export default {
       $contextMenu.style.left = (event.clientX) + 'px';
       $contextMenu.style.top = (event.clientY) + 'px';
     },
-    async drop(draggingNodes, position, event) {
+    drag(draggingNodes, position, event){
       console.log(this.nodes)
+      console.log("path", draggingNodes, position, event)
+    },
+    async drop(data, draggingNodes, position, event) {
+      console.log(data)
       console.log("path", draggingNodes, position, event)
     },
 

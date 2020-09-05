@@ -29,7 +29,8 @@ export default {
   },
   data () {
     return {
-     items: []
+     items: [],
+     projectName: ""
     }
   },
   async created() {
@@ -61,6 +62,7 @@ export default {
     },
     async openProject(projectName='project'){
       console.log("Opening", projectName)
+      this.projectName = projectName
       const response = await fetch("http://127.0.0.1:8000/open_project/"+projectName);
       const data = await response.json();
       var dict = {}
@@ -79,7 +81,7 @@ export default {
         let k = localStorage.key(i)
         dict[k] = localStorage[k]
       }
-      let filepost = {name:'.dict', content:JSON.stringify(dict)}
+      let filepost = {name:this.projectName+'/.dict', content:JSON.stringify(dict)}
       let settings = {
         method: 'POST',
         headers: {
@@ -93,6 +95,7 @@ export default {
     },
     async updateDict(file){
       this.saveDict()
+      file.detail.name = this.projectName + "/" + file.detail.name
       await this.createFile(file.detail);
     },
     async createFile(file) {

@@ -1,9 +1,9 @@
 <template>
-  <div id="filehandler" v-on:change="openFileDic">
+  <div id="filehandler" v-on:change="openFileDic" v-on:drop="dropBar($event, id)" v-on:dragover="allowDrop">
     <b-nav tabs >
       <b-nav-item class='filetab' v-for="file in this.files" v-bind:key="file" @click="openFile(file)"   v-bind:class="{'active':(tab === file)}"
-      :draggable="true"  v-on:dragstart="drag($event, file)"  
-      v-on:drop="drop($event, file)" v-on:dragover="allowDrop">
+      :draggable="true"  v-on:dragstart="drag($event, file, id)"  
+      v-on:drop="drop($event, file, id)" v-on:dragover="allowDrop">
                 <a> {{file.replace(/^.*[\\\/]/, '')}} </a>
         <button class='filetab' @click="closeFile(file)" v-on:click.stop>x</button>
       </b-nav-item>
@@ -26,11 +26,17 @@ export default {
   data() {
     return {
       tab: "",
+      parentContent: "",
+      mainApp: ""
     };
   },
   async created() {
-    this.$parent.$on("opening_file", this.openingFile);
-    this.$parent.$parent.$parent.$on("deleting_file", this.deletedFile);
+    this.parentContent = this.$parent.$parent.$parent
+    this.mainApp = this.parentContent.$parent.$parent
+    this.parentContent.$on("opening_file", this.openingFile);
+    this.parentContent.$on("close_file", this.file_is_closing);
+    this.mainApp.$on("deleting_file", this.deletedFile);
+    console.log("Created panel ", this.id, "open file ", this.files)
     if (this.files.length > 0)
         this.openFile(this.files[0])
   },
@@ -39,12 +45,47 @@ export default {
       event.preventDefault();
     },
 
-    drop(event, id){
-      var data = event.dataTransfer.getData("Text");
-      console.log(data, id)
+    drop(event, file, id){
+      event.stopPropagation();
+      var f = event.dataTransfer.getData("file");
+      var p = event.dataTransfer.getData("panel");
+      console.log(f, " from ", p, " to ",file, " on ", id)
+      if (p == id) {
+        let origin = this.files.indexOf(f)
+        let destiny = this.files.indexOf(file)
+        this.files.splice(origin, 1)
+        this.files.splice(destiny, 0, f)
+        this.openFile(f)
+      } else {
+        console.log("Close ", f, "on panel ", p)
+        this.parentContent.closeFile(f, p)
+        let destiny = this.files.indexOf(file)
+        this.files.splice(destiny, 0, f)
+        this.openFile(f)
+      }
+      
     },
-    drag(event, file){
-      event.dataTransfer.setData("Text", file);
+    dropBar(event, id){
+      var f = event.dataTransfer.getData("file");
+      var p = event.dataTransfer.getData("panel");
+      console.log(f, " from ", p,  " on ", id)
+      if (p == id) {
+        let destiny = this.files.length
+        let origin = this.files.indexOf(f)
+        this.files.splice(origin, 1)
+        this.files.splice(destiny, 0, f)
+        this.openFile(f)
+      }  else {
+        console.log("Close ", f, "on panel ", p)
+        this.parentContent.closeFile(f, p)
+        let destiny = this.files.length
+        this.files.splice(destiny, 0, f)
+        this.openFile(f)
+      }
+    },
+    drag(event, file, id){
+      event.dataTransfer.setData("file", file);
+      event.dataTransfer.setData("panel", id);
       console.log(event)
     },
     deletedFile(file){
@@ -61,26 +102,31 @@ export default {
       }
     },
     async closeFile(file) {
+      console.log("Close file ", file)
       let index = this.files.indexOf(file)
-      this.files.splice(index, 1);
-      const response = await fetch("http://127.0.0.1:8000/close_file/" + file);
-      const data = await response.json();
-      if (this.files.length > 0)
-        this.openFile(this.files[0])
-      else this.$parent.noFileOpen(this.id);
-      return data;
+      if (index){
+        this.files.splice(index, 1);
+        const response = await fetch("http://127.0.0.1:8000/close_file/" + file);
+        const data = await response.json();
+        console.log("open files now ", this.files)
+        if (this.files.length > 0)
+          this.openFile(this.files[0])
+        else this.parentContent.noFileOpen(this.id);
+        return data;
+      }
     },
     async openFile(item) {
-      this.$parent.openFile({"panel":this.id, "item":item})
-      this.$parent.$parent.$parent.openFileFromFiles(item);
+      console.log(item)
+      this.parentContent.openFile({"panel":this.id, "item":item}, true)
+      this.mainApp.openFileFromFiles(item);
       this.tab = item
     },
     async openFileDic(item) {
+      console.log("OPen File Dic", item.detail)
       const name = item.detail.name
-      this.$parent.openFile(name)
-       this.$parent.openFile({"panel":this.id, "item":name})
+      this.parentContent.openFileDict({"item":name}, true)
       console.log("name", name)
-      this.$parent.$parent.$parent.openFileFromFiles(name);
+      this.mainApp.openFileFromFiles(name);
     },
     openingFile(obj) {
       console.log("Active is ", obj.panel)
@@ -91,7 +137,7 @@ export default {
           let index = this.files.indexOf(short)
           this.files.splice(index, 1);
           if (this.files.length == 0)
-            this.$parent.noFileOpen(this.id);
+            this.parentContent.noFileOpen(this.id);
         }
       } else {      
         if (!this.files.includes(short)){
@@ -102,7 +148,12 @@ export default {
       }
     },
     createFile(){
-      this.$parent.$parent.$parent.createFile({'name':"", 'complete':false})
+      this.mainApp.createFile({'name':"", 'complete':false})
+    },
+    file_is_closing(panelid, file){
+      if (panelid == this.id){
+        this.closeFile(file)
+      }
     }
   },
   mounted: async function () {

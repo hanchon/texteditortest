@@ -1,11 +1,13 @@
 <template>
-  <div class="main-content" >
+  <div>
     <button @click="push">Push</button>
-    <div v-for="item in data" :key="item.id" v-on:drop="drop($event, item.id)" v-on:dragover="allowDrop">
-      <Files :files=item.files :id=item.id />
-      <Texto :id=item.id @input='update' v-show='item.text === 1' @active="setActive"/>
-      <EditDict v-show='item.text === 2' @active="setActive"/>
-    </div>
+    <splitpanes class="main-content default-theme" >
+      <pane v-for="item in data" :key="item.id" v-on:drop="drop($event, item.id)" v-on:dragover="allowDrop" min-size="15">
+        <Files :files=item.files :id=item.id />
+        <Texto :id=item.id @input='update' v-show='item.text === 1' @active="setActive"/>
+        <EditDict v-show='item.text === 2' @active="setActive"/>
+      </pane>
+    </splitpanes>
   </div>
 </template>
 
@@ -14,15 +16,20 @@
 import Texto from "./Texto.vue";
 import Files from "./Files.vue";
 import EditDict from "./EditDictionary.vue";
+import { Splitpanes, Pane } from 'splitpanes'
+import 'splitpanes/dist/splitpanes.css'
+
 export default {
   name: "Content",
   components: {
     Texto,
     Files,
-    EditDict
+    EditDict,
+    Splitpanes, 
+    Pane
   },
   data: function () {
-    return { data: [], active: 1  };
+    return { data: [], active: 1, overrideNextActive: false  };
   },
   created: async function () {
     this.$parent.$parent.$on("open_file_files", this.openFile);
@@ -34,24 +41,44 @@ export default {
     let files = data.files;
     this.data[0].files = files
   },
+  mounted: function(){
+    window.setInterval(async () => {
+      this.data.forEach(element => {
+        this.saveCurrentFile(element.id)
+      });
+    }, 30000);
+  },
   methods: {
     allowDrop:function(event) {
       event.preventDefault();
     },
 
     drop(event, id){
-       var data = event.dataTransfer.getData("Text");
-      console.log(data, id)
+      var f = event.dataTransfer.getData("file");
+      var p = event.dataTransfer.getData("panel");
+      console.log(f, " from ", p, " to ",id)
     },
 
     async push(){
+      console.log("Pre push", this.data)
       if (this.data.length == 1 && this.data[0].text != 1 )
         return;
       if (this.data[this.active].files.length == 1)
         return;
       let newid = this.data[this.data.length-1].id + 1
-      this.data.push({id:newid, content:"", file:"", text:1, files: [this.data.file]})
+      
+      let toOpen = ''
+      let push = this.data[this.active].file;
+      console.log("file to push", this.data[this.active].file)
+      if (this.data[this.active].files[0] != push)
+        toOpen = this.data[this.active].files[0]
+      else 
+        toOpen = this.data[this.active].files[1]
+      console.log("File to leave open ", toOpen)
+      await this.openFile({'panel':this.active, 'item': toOpen}, true)
+      this.data.push({id:newid, content:"", file:"", text:1, files: [push]})
       this.active = newid
+      console.log("POST push", this.data)
     },
     checkFileisOpen(file){
       var index = -1;
@@ -64,21 +91,24 @@ export default {
       });
       return index;
     },
+    async openFileDict(obj, save){
+      this.openFile(obj, save)
+      this.overrideNextActive = true
+    },
     async openFile(obj, save) {
-      console.log("Complete data opeening file ", obj.item)
-      console.log(this.data)
-      console.log("openfile ", obj)
-      console.log("File is open on ", this.checkFileisOpen(obj.item))
       if (obj.panel === 0 || obj.panel) {
         this.setActive(obj.panel)
-        console.log("Opening file on ", obj.panel)
       } else {
         var isOpenOn = this.checkFileisOpen(obj.item)
-        if (isOpenOn != -1)
+        if (isOpenOn != -1){
+          console.log("File is already open on ", isOpenOn)
           this.setActive(isOpenOn)
+        } else console.log("File was not open ")
       }
+      console.log("Active panel is", this.active)
 
       let file = obj.item
+      console.log ("open File ", file, " ",  save)
       if (file!=""){
         if (save){
           await this.saveCurrentFile()
@@ -88,13 +118,19 @@ export default {
         
         this.$emit("update_text", { panel: this.data[this.active].id, text: data.raw, file: file });
         this.$emit("opening_file", { panel: this.data[this.active].id, file: file })
-        this.data.content = data.raw
-        this.data.file = file
+        this.data[this.active].content = data.raw
+        this.data[this.active].file = file
+        console.log("Current open file ", )
         this.data[this.active].text = 1
       }
     },
-    async saveCurrentFile(){
-      let filepost = {name:this.data.file,content:this.data.content}
+    async saveCurrentFile(panel_id=-1){
+      let panel_index
+      if (panel_id == -1 )
+        panel_index = this.active
+      else panel_index = this.panel_index(panel_id)
+      console.log("Save ", this.data[panel_index].file, " on ", this.data[panel_index].content)
+      let filepost = {name:this.data[panel_index].file,content:this.data[panel_index].content}
       let settings = {
         method: 'POST',
         headers: {
@@ -105,8 +141,8 @@ export default {
       }
       const response1 = await fetch("http://127.0.0.1:8000/save_filepost/", settings);
       await response1.json();
-      this.data.file=''
-      this.data.content=''
+      //this.data[this.active].file=''
+      //this.data[this.active].content=''
     },
     update(text){
       this.data[this.active].content = text.content
@@ -123,24 +159,54 @@ export default {
         }
       });
       console.log("No files open in id=", panel, " INDEX ",index)
-      if (this.data.length == 1)
-        this.data[index].text = 3
-      else {
-        this.data.splice(index, 1);
-        this.active = this.data.length-1
-        console.log("Deleted panel ", panel, " with index ", index)
-        console.log("New active is", this.active)
+      if(index == 0 || index) {
+        if (this.data.length == 1)
+          this.data[index].text = 3
+        else {
+          this.data.splice(index, 1);
+          this.active = this.data.length-1
+          console.log("Deleted panel ", panel, " with index ", index)
+          console.log("New active is", this.active)
+          console.log("POST DELETE", this.data)
+        }
       }
     },
     setActive(panel){
+      if (!this.overrideNextActive) {
+        var index;
+        this.data.forEach(element => {
+            if (element.id == panel) {
+              index = this.data.indexOf(element);
+            }
+        });
+        this.active = index;
+        console.log("New active is ", panel, " on index ", this.active)
+      } else console.log("OVerride active")
+      this.overrideNextActive = false
+      if (typeof this.active == 'undefined')
+        this.active = this.data[0].id
+    },
+    async closeFile(file, panelid){
       var index;
       this.data.forEach(element => {
-          if (element.id == panel) {
-            index = this.data.indexOf(element);
-          }
+        if (element.id == panelid) {
+        index = this.data.indexOf(element);
+        }
       });
-      this.active = index;
-      console.log("New active is ", panel, " on index ", this.active)
+      if (index) {
+        await this.saveCurrentFile()
+        let f_index = this.data[index].files.indexOf(file)
+        console.log("content, ", this.data[index].files)
+        
+        console.log("content, ", this.data[index].files)
+        await this.$emit('close_file', panelid, file)
+        this.data[index].files.splice(f_index, 1)
+        if (this.data[index].files.length == 0)
+          this.noFileOpen(panelid)
+      }      
+    },
+    panel_index(id){
+      return id;
     }
   },
 };

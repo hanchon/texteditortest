@@ -261,15 +261,15 @@ export default class LinkUI extends Plugin {
 				// Then show panel but keep focus inside editor editable.
 				//this._showUI();
 				// TODO INSERT CODIGO OPEN FILE
-				
-				const linkToFollow = this.editor.commands.get( 'link' ).value
+				/// ### RAMA CODE
+				const keyToLink = this.editor.commands.get( 'link' ).value
+				const link = localStorage[keyToLink]
 				//openFile("rama.html")
+				console.log(document.getElementById("treefile"))
 				document.getElementById("filehandler").dispatchEvent(new CustomEvent("change", {
-					detail: { name: linkToFollow }}));
+					detail: { name: link }}));
 				//console.log(element)
 				//element.dispatchEvent(new Event("change"));
-				
-
 			}
 		} );
 

@@ -66,15 +66,20 @@
                             'imageStyle:side',
                         ]
                     },
-                }
+                },
+                parentContent: "",
+                mainApp: ""
             };
         },
         created: async function () {
-          this.$parent.$on("update_text", this.update_text);
+          this.parentContent = this.$parent.$parent.$parent
+          this.mainApp = this.parentContent.$parent.$parent
+          this.parentContent.$on("update_text", this.update_text);
           this.$on("change", this.onReady);          
         },
         methods: {
           imActive (){
+              console.log("texto active")
               this.$emit("active", this.id)
           },
           onEditorInput: function () {

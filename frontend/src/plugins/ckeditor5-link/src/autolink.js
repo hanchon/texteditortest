@@ -233,6 +233,7 @@ function isSingleSpaceAtTheEnd( text ) {
 }
 
 function getUrlAtTextEnd( text ) {
+	/// ### RAMA CODE
 	var URL_REG_EXP;
 	for (let i=0; i < localStorage.length; i++){
 		let key = localStorage.key(i)
@@ -244,7 +245,7 @@ function getUrlAtTextEnd( text ) {
 			while ((arraymatch = URL_REG_EXP.exec( text )) !== null) {
 				console.log(`Found ${arraymatch[0]}. Next starts at ${URL_REG_EXP.lastIndex}.`);
 				if (text.length  == URL_REG_EXP.lastIndex){
-					return {"key":key, "url":localStorage[key]}	
+					return {"key":key, "url":key}	
 				}
 				if (tries==3){
 					console.log("3 tries")

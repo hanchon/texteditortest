@@ -170,7 +170,8 @@ export default {
 /* Color not working, not overriding boostrap*/
 .filetab {
   background-color: white;
-  color: black; 
+  color: black;
+  z-index: 0; 
 }
 
 .active {

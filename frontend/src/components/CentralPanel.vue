@@ -46,6 +46,11 @@ a {
 }
 .cont {
   z-index: 1;
+  position: fixed;
+  width: 100%;
+  height: 100%;
+  margin-left: 0%;
+  z-index:1;
 }
 
 </style>

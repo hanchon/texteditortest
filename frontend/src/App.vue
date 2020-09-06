@@ -1,7 +1,7 @@
 <template>
   <div>
     <div>
-      <b-navbar type="dark">
+      <b-navbar class="navbarr" type="dark">
         <b-dropdown id="dropdown" text="File" >
           <b-dropdown-item class="context" href="#" @click="createProject">Create New Project</b-dropdown-item>
         </b-dropdown>
@@ -171,5 +171,9 @@ export default {
 .context {
   z-index: 10000;
 }
-
+.navbarr {
+  position: fixed;
+  top: 0;
+  width: 100%;
+}
 </style>

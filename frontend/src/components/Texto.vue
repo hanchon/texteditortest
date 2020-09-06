@@ -35,6 +35,7 @@
             return {
                 editor: ClassicEditor,
                 editorData: '<p>Content of the editor.</p>',
+                
                 editorConfig: {
                     plugins: [
                         EssentialsPlugin,
@@ -52,6 +53,7 @@
                     ],
 
                     toolbar: {
+                        viewportTopOffset : 130,
                         items: [
                             'heading',
                             'bold',
@@ -105,7 +107,11 @@
 
 <style>
     .ck-editor{
-        position:relative;
+        position: sticky;
+        margin-top: 0%;
+        overflow-y: auto;
+        height: 100%;
+        width: 100%;
     }
 
 </style>
